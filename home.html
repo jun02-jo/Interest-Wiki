@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body>
+<body onload="initData()">
     <div id="container">
         <header>
             <h1>
                 <span class="header-title">
-                    <a href="#">관심사 위키</a>
+                    <a href="home.html">관심사 위키</a>
                 </span>
 
                 <div id="search">
@@ -26,20 +26,20 @@
 
         <div id="content">
             <aside>
-                <div id="cartegory">
-                    <h3 id="cartegory-title">카테고리</h3>
+                <div id="category">
+                    <h3 id="category-title">카테고리</h3>
                     <hr>
 
-                    <ul>
+                    <ul id="show-categories">
                         <!-- 미리보기 부분입니다. -->
-                        <!-- <li class="cartegory-content">
-                            <a href="#">스포츠</a>
+                        <!-- <li class="category-content">
+                            <a href="home.html">스포츠</a>
                         </li>
-                        <li class="cartegory-content">
-                            <a href="#">게임</a>
+                        <li class="category-content">
+                            <a href="home.html">게임</a>
                         </li>
-                        <li class="cartegory-content">
-                            <a href="#">영화</a>
+                        <li class="category-content">
+                            <a href="home.html">영화</a>
                         </li> -->
                         <!-- 미리보기 부분입니다. -->
                     </ul>
@@ -54,13 +54,13 @@
                     
                     <div id="new-contents">
                         <!-- 미리보기 부분입니다. -->
-                        <!-- <div class="new-content" onclick="getContent()">
+                        <!-- <div class="new-content" data-index="0">
                             <div class="new-content-title">Title</div>
                             <p class="new-content-content"><strong style="font-size: 2em;">L</strong>orem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam explicabo similique reiciendis tenetur, officia distinctio aut, iste reprehenderit numquam quia sunt itaque! Ducimus, illo sunt laboriosam facilis quibusdam quos minima.</p>
                         </div>
-                        <hr>
+                        <hr> -->
                         
-                        <div class="new-content" onclick="getContent()">
+                        <!-- <div class="new-content" onclick="getContent()">
                             <div class="new-content-title">Title</div>
                             <p class="new-content-content"><strong style="font-size: 2em;">L</strong>orem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam explicabo similique reiciendis tenetur, officia distinctio aut, iste reprehenderit numquam quia sunt itaque! Ducimus, illo sunt laboriosam facilis quibusdam quos minima.</p>
                         </div>
@@ -128,9 +128,17 @@
                         <div id="create-head">
                             <button class="prev" onclick="prevPage()"><</button>
                             <input type="text" id="create-title" placeholder="제목">
-                            <select name="" id="create-cartegory">
-                                <option value="">카테고리 추가</option>
+                            <!-- 카테고리 선택 -->
+                            <select id="select-category">
+                                <option id="category-none" value="none">카테고리 없음</option>
                             </select>
+                            <button id="create-category-button">카테고리 추가</button>
+                            <!-- 카테고리 추가 -->
+                            <div id="create-category-dummy"></div>
+                            <div id="create-category">
+                                <input type="text" id="create-category-name" placeholder="카테고리 입력">
+                                <button id="create-new-category">추가</button>
+                            </div>
                         </div>
                         <div id="create-body">
                             <div id="create-commands">
@@ -145,7 +153,7 @@
                             <div id="create-content" contenteditable="true"></div>
                         </div>
                         <div id="create-foot">
-                            <button class="content-save" onclick="saveContent()">저장</button>
+                            <button id="content-save">저장</button>
                         </div>
                     </div>
                 </article>
@@ -156,6 +164,22 @@
 
                 <arcitle id="main-content">
                     <!-- 본문 페이지 -->
+                    <div id="content-head">
+                        <div id="content-title">
+
+                        </div>
+                        <ul id="content-buttons">
+                            <li>
+                                <button class="content-update">수정</button>
+                            </li>
+                            <li>
+                                <button class="content-delete">삭제</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="content-body">
+
+                    </div>
                 </arcitle>
             </section>
         </div>

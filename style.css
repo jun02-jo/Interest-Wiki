@@ -88,32 +88,32 @@ aside {
     padding: 1em;
 }
 
-#cartegory {
+#category {
     text-align: left;
 }
 
-#cartegory-title {
+#category-title {
     margin-bottom: 0.3em;
     padding-left: 0.3em;
 }
 
-.cartegory-content {
+.category-content {
     margin-top: 0.3em;
     padding-left: 0.3em;
 }
 
-.cartegory-content a {
+.category-content a {
     color: #2a2a2a;
     transition: .4s;
 }
 
-.cartegory-content a:hover {
+.category-content a:hover {
     color: #2a2a2a55;
 }
 
 
 /* 메인 페이지 */
-section#main {
+#main {
     float: left;
     background-color: #f0fff0;
     width: 100%;
@@ -123,7 +123,7 @@ section#main {
 
 
 /* 최근 글 페이지(기본 페이지) */
-article#main-new-contents {
+#main-new-contents {
     background-color: #f0fff0;
     /*       상  우  하  좌       */
     padding: 1em 1em 1em 1em;
@@ -135,6 +135,7 @@ article#main-new-contents {
     padding-bottom: 0.5em;
 }
 
+/* 최근 글 */
 .new-content {
     display: block;
     margin: 1em 0;
@@ -145,13 +146,39 @@ article#main-new-contents {
 }
 
 .new-content-title {
+    display: inline;
     font-weight: bold;
     font-size: 2.1em;
 }
 
+/* 최근 글 수정, 삭제 버튼
+.new-content-buttons {
+    float: right;
+}
+
+.new-content-buttons button {
+    border: none;
+    background-color: #f0fff0;
+    box-shadow: 3px 3px 8px #b0bbb0;
+    padding: 10px 15px;
+    margin-right: 5px;
+    transition: .25s;
+    outline: 0;
+}
+
+.new-content-buttons button:active {
+    box-shadow: none;
+    border: none;
+    transform: translate(5px, 5px);
+}
+
+.new-content-content {
+    clear: both;
+} */
+
 
 /* 글 작성 페이지 */
-article#main-create-screen {
+#main-create-screen {
     display: none;
     width: 100%;
     height: 100%;
@@ -182,21 +209,76 @@ article#main-create-screen {
 }
 
 #create-head #create-title {
-    width: 80%;
+    width: 70%;
     padding: 4pt;
-    margin-right: 15px;
+    margin-right: 10px;
 }
 
-#create-head #create-cartegory {
-    width: 15%;
-    padding: 4pt;
+#create-head #select-category {
+    line-height: 30px;
+    border: 1px solid black;
+    padding: 5px 10px;
 }
 
+#create-category-button {
+    width: 10%;
+    border: 1px solid black;
+    background-color: white;
+    outline: 0;
+    margin: 0 10px;
+    padding: 5px;
+    box-shadow: 0px 0px 3px grey;
+    transition: .2s;
+}
+
+#create-category-button:active {
+    box-shadow: none;
+    transform: scale(0.95);
+}
+
+#create-category-dummy {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #00000025;
+}
+
+#create-category {
+    position: fixed;
+    right: 0;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 25px;
+    padding: 30px 20px;
+    margin-top: 3%;
+    margin-right: 5%;
+    text-align: center;
+    display: none;
+    box-shadow: 0 0 5px #000000;
+}
+
+#create-category-name,
+#create-new-category {
+    display: inline-block;
+}
+
+#create-category-name {
+    padding: 0.5em;
+}
+
+#create-new-category {
+
+}
+
+
+/* 글 작성 중간 부분(글 작성) */
 #create-body, #create-foot {
     padding-left: 5px;
 }
 
-/* 글 작성 중간 부분(글 작성) */
 #create-body {
     height: 80%;
 }
@@ -225,12 +307,13 @@ article#main-create-screen {
     overflow: auto;
 }
 
+
 /* 글 작성 끝 부분(저장 버튼) */
 #create-foot {
     float: right;
 }
 
-#create-foot .content-save {
+#create-foot #content-save {
     border: 1px solid black;
     background-color: white;
     padding: 10px 20px;
@@ -238,14 +321,14 @@ article#main-create-screen {
 
 
 /* 검색 페이지 */
-article#main-search-screen {
+#main-search-screen {
     display: none;
     width: 100%;
     height: 100%;
 }
 
 /* 본문 페이지 */
-article#main-content {
+#main-content {
     display: none;
     width: 100%;
     height: 100%;
@@ -328,4 +411,15 @@ article#main-content {
     font-family: sans-serif;
     color: #f0f0f0;
     font-size: 1.2em;
+}
+
+/* 검색 페이지 */
+#main-search-screen {
+    display: none;
+}
+
+
+/* 본문 페이지 */
+#main-content {
+    display: none;
 }
