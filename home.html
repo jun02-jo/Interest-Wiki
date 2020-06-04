@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body onload="initData()">
+<body>
     <div id="container">
         <header>
             <h1>
@@ -47,7 +47,7 @@
             </aside>
 
             <section id="main">
-                <article id="main-new-contents">
+                <article id="main-new-content">
                     <!-- 최근 글을 알려주는 페이지 -->
                     <h2>최근 글</h2>
                     <hr>
@@ -136,6 +136,9 @@
                             <!-- 카테고리 추가 -->
                             <div id="create-category-dummy"></div>
                             <div id="create-category">
+                                <div id="close-create-category">
+                                    <span id="close-create-category-button">X</span>
+                                </div>
                                 <input type="text" id="create-category-name" placeholder="카테고리 입력">
                                 <button id="create-new-category">추가</button>
                             </div>
@@ -165,26 +168,26 @@
                 <arcitle id="main-content">
                     <!-- 본문 페이지 -->
                     <div id="content-head">
-                        <div id="content-title">
-
+                        <!-- 미리보기 부분입니다. -->
+                        <button class="prev" onclick="prevPage()"><</button>
+                        <div id="content-title">Title</div>
+                        <div id="content-buttons">
+                            <button class="content-update-button">수정</button>
+                            <button class="content-delete-button">삭제</button>
                         </div>
-                        <ul id="content-buttons">
-                            <li>
-                                <button class="content-update">수정</button>
-                            </li>
-                            <li>
-                                <button class="content-delete">삭제</button>
-                            </li>
-                        </ul>
+                        <!-- 미리보기 부분입니다. -->
+                    </div>
+                    <div id="content-nav">
+                        <div id="content-toc">목차</div>
+                        <ul id="content-toc-nav"></ul>
                     </div>
                     <div id="content-body">
-
+                        
                     </div>
                 </arcitle>
             </section>
         </div>
     </div>
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="changePage.js"></script>
     <script src="main.js"></script>
 </body>

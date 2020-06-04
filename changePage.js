@@ -2,7 +2,7 @@
 
 // 페이지에 관련된 데이터들
 var pages = {
-    new: "main-new-contents",
+    new: "main-new-content",
     create: "main-create-screen",
     search: "main-search-screen",
     content: "main-content"
