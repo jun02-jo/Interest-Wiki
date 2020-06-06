@@ -142,7 +142,11 @@ create_new_category.addEventListener("click", function () {
     create_category.style.display = "none";
 
     // 입력된 값을 가져온다.
-    var category_name = document.getElementById("create-category-name").value;
+    var input_category = document.getElementById("create-category-name");
+    var category_name = input_category.value;
+
+    // 카테고리 추가에 있는 input태그의 값을 비운다.
+    input_category.value = "";
 
     // 리스트에 값이 존재하거나 입력 값이 비어있는지 검사한다.
     if (categories.indexOf(category_name) != -1 || category_name.length == 0) {
@@ -164,6 +168,9 @@ close_create_cartegory_button.addEventListener("click", function() {
 
     var create_category = document.getElementById("create-category");
     create_category.style.display = "none";
+    
+    var input_category = document.getElementById("create-category-name");
+    input_category.value = "";
 })
 
 // 카테고리를 선택하는 부분의 데이터를 업데이트 하는 함수이다.
@@ -199,10 +206,15 @@ save.addEventListener("click", saveContent);
 // 저장
 function saveContent() {
     // 제목, 카테고리, 내용 가져오기
-    create_title = document.querySelector("#create-title").value;
-    create_category = document.querySelector("#select-category").value;
-    create_content = document.querySelector("#create-content").innerText;
-    create_content_html = document.querySelector("#create-content").innerHTML;
+    var title = document.getElementById("create-title");
+    var category = document.getElementById("select-category");
+    var content = document.getElementById("create-content");
+
+    // 각 요소의 값들만 가져온다.
+    var create_title = title.value;
+    var create_category = category.value;
+    var create_content = content.innerText;
+    var create_content_html = content.innerHTML;
 
     /* 만약 비어있는 경우에 저장을 누르면 이상하게 작동하므로
     경고 문구를 띄워준다. */
@@ -274,12 +286,8 @@ function saveContent() {
     new_contents.appendChild(hr);
 
 
-    /* 저장이 완료되면 최근 글 페이지로 돌아가고 제목, 카테고리, 내용 부분이 초기화 된다. */
-    // 초기화 함수 호출
-    // create_title = "";
-    // create_category = "";
-    // create_content = "";
-    // create_content_html = "";
+    /* 저장이 완료되면 최근 글 페이지로 돌아가고 제목, 카테고리, 내용 부분이 초기화 되며
+    이전 페이지로 돌아가게 된다. */
     prevPage();
 }
 
