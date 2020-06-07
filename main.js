@@ -263,7 +263,7 @@ function saveContent() {
     var new_content = document.createElement("div");
     new_content.setAttribute("class", "new-content");
     new_content.setAttribute("onclick", "getContent(" + sectionValue + ")");
-    // new_content.dataset.index = sectionValue;
+    new_content.dataset.index = sectionValue;
 
     // 최근 글 타이틀 설정
     var new_content_title = document.createElement("div");
@@ -418,6 +418,9 @@ window.addEventListener("mouseup", function() {
 function getContent(value) {
     movePage('content');
     var content = JSON.parse(localStorage.getItem("contents"))[value];
+
+    var content_head = document.getElementById("content-head");
+    content_head.dataset.index = value;
 
     // 본문 페이지의 타이틀, 본문 요소를 가지고 온다.
     var content_title = document.getElementById("content-title");
