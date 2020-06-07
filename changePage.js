@@ -32,7 +32,7 @@ function movePage(nextPageKey) {
 }
 
 // 이전 페이지로 돌아가는 함수
-function prevPage() {
+function prevPage(load=false) {
     /* pagesData의 맨 뒤의 값(현재 페이지)을 가져와 페이지가 보이지 않도록 설정한다. */
     if (pagesData.length > 1) {
         var cur = document.getElementById(pageClear(pagesData.pop()));
@@ -42,6 +42,9 @@ function prevPage() {
         prev_page = pagesData[pagesData.length - 1];
         var prev = document.getElementById(prev_page);
         prev.style.display = "block";
+        if (load == true) {
+            loadPage(prev_page);
+        }
     }
 }
 
@@ -59,4 +62,58 @@ function pageClear(page) {
     }
 
     return page;
+}
+
+function loadPage(page) {
+    if (page == pages['new']) {        
+        // contents를 가지고 온다.
+        var contents = JSON.parse(localStorage.getItem("contents"));
+        
+        var main = document.getElementById(page);
+
+        // new-contents를 삭제하고 다시 추가한다.
+        var new_contents = document.getElementById("new-contents");
+        new_contents.remove();
+
+        new_contents = document.createElement("div");
+        new_contents.setAttribute("id", "new-contents");
+
+        main.appendChild(new_contents);
+
+        /* 스토리지에 저장된 글 수만큼 가지고 온다. */
+        for (var i = 0; i < sectionValue; i++) {
+            if (contents[i] == undefined) {
+                continue;
+            } else {
+                // 최상위 부모 요소 가져오기
+                var new_contents = document.getElementById("new-contents");
+
+                // 최근 글의 타이틀과 내용을 가지는 부모 요소
+                var new_content = document.createElement("div");
+                new_content.setAttribute("class", "new-content");
+                new_content.setAttribute("onclick", "getContent(" + i + ")");
+                new_content.dataset.index = i;
+
+                // 최근 글의 타이틀 설정
+                var new_content_title = document.createElement("div");
+                new_content_title.setAttribute("class", "new-content-title");
+                new_content_title.innerText = checkString(contents[i]["title"], 15, "title");
+                new_content.appendChild(new_content_title);
+
+                // 최근 글의 내용설정
+                var new_content_content = document.createElement("p");
+                new_content_content.setAttribute("class", "new-content-content");
+                new_content_content.innerHTML = "&emsp;" + checkString(contents[i]["content"]);
+                new_content.appendChild(new_content_content);
+
+
+                // 구분선 추가
+                var hr = document.createElement("hr");
+                new_content.appendChild(hr);
+
+                // 최근 글 추가
+                new_contents.prepend(new_content);
+            }
+        }
+    }
 }

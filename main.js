@@ -1,5 +1,5 @@
 var saveData = {};
-var contents = {};
+// var contents = {};
 var categories = [];
 var sectionValue = 0;
 
@@ -43,13 +43,14 @@ function getCategories() {
         category_delete_icon.setAttribute("class", "fa fa-times");
 
         // 임시
-        var a = document.createElement("a");
-        a.setAttribute("href", "home.html");
-        a.innerText = category;
+        var span = document.createElement("span");
+        // span.setAttribute("href", "home.html");
+        span.dataset.category = category;
+        span.innerText = category;
 
         category_delete.appendChild(category_delete_icon);
         li.appendChild(category_delete);
-        li.appendChild(a);
+        li.appendChild(span);
         show_categories.appendChild(li);
 
         // 글 작성 페이지에 있는 카테고리 선택 부분에 추가한다.
@@ -69,11 +70,14 @@ function getCategories() {
 /* 최근 글들을 가져오는 함수 */
 function getNewContents() {
     // contents를 가지고 온다.
-    contents = JSON.parse(localStorage.getItem("contents"));
+    var contents = JSON.parse(localStorage.getItem("contents"));
     
 
     /* 스토리지에 저장된 글 수만큼 가지고 온다. */
     for (var i = 0; i < sectionValue; i++) {
+        if (contents[i] == undefined) {
+            continue;
+        }
         // 최상위 부모 요소 가져오기
         var new_contents = document.getElementById("new-contents");
 
@@ -81,7 +85,7 @@ function getNewContents() {
         var new_content = document.createElement("div");
         new_content.setAttribute("class", "new-content");
         new_content.setAttribute("onclick", "getContent(" + i + ")");
-        // new_content.dataset.index = i;
+        new_content.dataset.index = i;
 
         // 최근 글의 타이틀 설정
         var new_content_title = document.createElement("div");
@@ -95,12 +99,12 @@ function getNewContents() {
         new_content_content.innerHTML = "&emsp;" + checkString(contents[i]["content"]);
         new_content.appendChild(new_content_content);
 
-        // 최글 글 추가
-        new_contents.appendChild(new_content);
-
         // 구분선 추가
         var hr = document.createElement("hr");
-        new_contents.appendChild(hr);
+        new_content.appendChild(hr);
+        
+        // 최글 글 추가
+        new_contents.prepend(new_content);
     }
 }
 
@@ -256,7 +260,7 @@ function saveContent() {
     saveContentData()
 
     /* new-content에 새로운 포스트 저장 */
-    // 최근 글 부모 요소 가져오기
+    //최근 글 부모 요소 가져오기
     var new_contents = document.getElementById("new-contents");
 
     // 새로운 콘텐츠의 부모 요소 가져오기
@@ -291,14 +295,12 @@ function saveContent() {
     // 최근 글 타이틀과 본문을 최근 글 자식 요소로 추가한다.
     new_content.appendChild(new_content_content);
     
-    // 최근 글에 새롭게 작성된 글을 추가한다.
-    new_contents.appendChild(new_content);
-
-
     /* 구분선 추가 */
     var hr = document.createElement("hr");
-    new_contents.appendChild(hr);
+    new_content.appendChild(hr);
 
+    // 최근 글에 새롭게 작성된 글을 추가한다.
+    new_contents.prepend(new_content);
 
     // 현재까지 저장된 sectionValue 저장
     localStorage.setItem("sectionValue", ++sectionValue);
@@ -351,13 +353,14 @@ function createCategory(parent, categoryName) {
     category_delete_icon.setAttribute("class", "fa fa-times");
 
     // 검색 기능을 만들면 수정 필요
-    var a = document.createElement("a");
-    a.setAttribute("href", "home.html");
-    a.innerText = categoryName;
+    var span = document.createElement("span");
+    // span.setAttribute("href", "home.html");
+    span.dataset.category = categoryName;
+    span.innerText = categoryName;
 
     category_delete.appendChild(category_delete_icon);
     li.appendChild(category_delete);
-    li.appendChild(a);
+    li.appendChild(span);
     parent.appendChild(li);
 }
 
@@ -379,8 +382,8 @@ function saveContentData() {
 // 글 작성 시 제목의 글자 수가 30자를 넘어가지 않도록 한다.
 document.getElementById("create-title").onkeydown = function() {
     // 입력받을 최대 글자 수(30자)를 넘어갈 경우 경고창을 내보낸다
-    console.log(event);
-    console.log(event.keyCode);
+    // console.log(event);
+    // console.log(event.keyCode);
     var str = document.getElementById("create-title").value;
     var maxLength = 30;
     var strCheck = false;
