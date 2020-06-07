@@ -1,3 +1,4 @@
+/* 휴먼둥근헤드라인 */
 @font-face {
     font-family: 'headline_rregular';
     src: url('fonts/hmkmrhd-webfont.eot');
@@ -9,6 +10,9 @@
     font-weight: normal;
     font-style: normal;
 }
+
+/* 나눔 고닥 */
+@import url('https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800');
 
 * {
     padding: 0;
@@ -23,6 +27,7 @@ html, body {
 body {
     background-color: #d2d7dd;
     overflow-y: scroll;
+    word-break: break-all;
 }
 
 li {
@@ -102,13 +107,28 @@ aside {
     padding-left: 0.3em;
 }
 
+.category-delete i {
+    color: #f2f7fd;
+    cursor: pointer;
+    transition: .3s;
+    margin-right: 5px;
+}
+
+.category-delete i:hover {
+    color: #989ba0;
+}
+
+.category-delete i:active {
+    transform: scale(0.8) translateY(3px);
+}
+
 .category-content a {
     color: #2a2a2a;
-    transition: .4s;
+    transition: .3s;
 }
 
 .category-content a:hover {
-    color: #2a2a2a55;
+    color: #aaaaaa;
 }
 
 
@@ -124,6 +144,7 @@ aside {
 
 /* 최근 글 페이지(기본 페이지) */
 #main-new-content {
+    /* display: none; */
     background-color: #f0fff0;
     /*       상  우  하  좌       */
     padding: 1em 1em 1em 1em;
@@ -151,31 +172,6 @@ aside {
     font-size: 2.1em;
 }
 
-/* 최근 글 수정, 삭제 버튼
-.new-content-buttons {
-    float: right;
-}
-
-.new-content-buttons button {
-    border: none;
-    background-color: #f0fff0;
-    box-shadow: 3px 3px 8px #b0bbb0;
-    padding: 10px 15px;
-    margin-right: 5px;
-    transition: .25s;
-    outline: 0;
-}
-
-.new-content-buttons button:active {
-    box-shadow: none;
-    border: none;
-    transform: translate(5px, 5px);
-}
-
-.new-content-content {
-    clear: both;
-} */
-
 
 /* 글 작성 페이지 */
 #main-create-screen {
@@ -186,7 +182,7 @@ aside {
 
 #create-form {
     background-color: white;
-    width: 100%;
+    width: 1232px;
     height: 100%;
     padding: 15px;
 }
@@ -368,6 +364,7 @@ aside {
 #create-body #create-content {
     padding: 5px;
     height: 85%;
+    width: 1215px;
     overflow: auto;
 }
 
@@ -486,4 +483,118 @@ aside {
 /* 본문 페이지 */
 #main-content {
     display: none;
+    background-color: white;
+    width: 100%;
+    height: calc(100vh - 59px);
+}
+
+/* 본문 페이지 머리 부분 */
+#content-head {
+    position: relative;
+    border-bottom: 1px solid #101010;
+    padding: 1em 1.5em;
+    width: 93%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#content-head > div, #content-head > button {
+    display: inline-block;
+}
+
+/* 뒤로가기 버튼 */
+.prev {
+    margin-top: 10px;
+    margin-left: 20px;
+    font-size: 1.7em;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+}
+
+/* 본문 제목 */
+#content-title {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 3.2em;
+    font-weight: bold;
+}
+
+/* 본문 수정, 삭제 버튼 */
+#content-buttons {
+    float: right;
+    margin-top: 2.2em;
+}
+
+#content-buttons > button {
+    padding: 0.5em 1em;
+    outline: 0;
+    transition: .3s;
+    background-color: white;
+    border: 1px solid black;
+}
+
+#content-buttons > button:hover {
+    transform: scale(1.1) translateY(-3px);
+}
+
+#content-buttons > button:active {
+    transform: scale(0.9) translateY(3px);
+}
+
+
+/* 본문 페이지 목차 부분 */
+#content-nav {
+    display: inline-block;
+    border: 1px solid #202020;
+    padding: 1.5em;
+    background-color: #fafafa;
+    margin: 2em 0 2em 3.5em;
+    position: relative;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+#content-nav::after {
+    content: '';
+    border-bottom: 1px solid black;
+    margin-top: 10px;
+}
+
+#content-toc {
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+#content-toc-nav {
+    margin-left: 0.5em;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+#content-toc-nav > li {
+    margin-top: 0.5em;
+}
+
+
+/* 본문 페이지 본문 부분 */
+#content-body {
+    position: relative;
+    padding: 1em 1.5em;
+    border-top: 1px solid black;
+    width: 93%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+#content-body::after {
+    content: '';
+    background-color: transparent;
+    height: 100%;
+    width: 1.5em;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#content-content {
+    width: 1211px;
+    padding-right: 1.5em;
 }

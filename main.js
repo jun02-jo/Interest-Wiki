@@ -22,7 +22,9 @@ function initData() {
 
 /* 카테고리를 가져오는 함수 */
 function getCategories() {
-    var categoryList = JSON.parse(localStorage.getItem("categories")); // Array
+    categories = JSON.parse(localStorage.getItem("categories"));
+    var categoryList = JSON.parse(JSON.stringify(categories)); // Array
+    // var categoryList = JSON.parse(localStorage.getItem("categories"));
     var category = categoryList.shift();
 
     while (category != undefined) {
@@ -32,11 +34,21 @@ function getCategories() {
         var li = document.createElement("li");
         li.setAttribute("class", "category-content");
 
+        // 삭제 버튼
+        var category_delete = document.createElement("span");
+        category_delete.setAttribute("class", "category-delete");
+
+        // 삭제 버튼 아이콘
+        var category_delete_icon = document.createElement("i");
+        category_delete_icon.setAttribute("class", "fa fa-times");
+
         // 임시
         var a = document.createElement("a");
         a.setAttribute("href", "home.html");
         a.innerText = category;
 
+        category_delete.appendChild(category_delete_icon);
+        li.appendChild(category_delete);
         li.appendChild(a);
         show_categories.appendChild(li);
 
@@ -74,13 +86,13 @@ function getNewContents() {
         // 최근 글의 타이틀 설정
         var new_content_title = document.createElement("div");
         new_content_title.setAttribute("class", "new-content-title");
-        new_content_title.innerText = contents[i]["title"];
+        new_content_title.innerText = checkString(contents[i]["title"], 15, "title");
         new_content.appendChild(new_content_title);
 
         // 최근 글의 내용설정
         var new_content_content = document.createElement("p");
         new_content_content.setAttribute("class", "new-content-content");
-        new_content_content.innerHTML = checkString(contents[i]["content"]);
+        new_content_content.innerHTML = "&emsp;" + checkString(contents[i]["content"]);
         new_content.appendChild(new_content_content);
 
         // 최글 글 추가
@@ -119,10 +131,8 @@ function setCategories() {
 
 
 /* 생성 부분 */
-
 // 카테고리 추가 버튼을 눌렀을 때
-var create_category_button = document.getElementById("create-category-button");
-create_category_button.addEventListener("click", function() {
+document.getElementById("create-category-button").addEventListener("click", function() {
     // 카테고리 추가 화면을 보이도록 설정한다.
     var create_category_dummy = document.getElementById("create-category-dummy");
     create_category_dummy.style.display = "block";
@@ -132,8 +142,7 @@ create_category_button.addEventListener("click", function() {
 });
 
 // 카테고리 추가하는 함수
-var create_new_category = document.getElementById("create-new-category");
-create_new_category.addEventListener("click", function () {
+document.getElementById("create-new-category").addEventListener("click", function () {
     // 카테고리 추가 화면을 보이지 않도록 설정한다.
     var create_category_dummy = document.getElementById("create-category-dummy");
     create_category_dummy.style.display = "none";
@@ -160,19 +169,6 @@ create_new_category.addEventListener("click", function () {
     }
 });
 
-// 카테고리 추가 화면을 끄는 기능
-var close_create_cartegory_button = document.getElementById("close-create-category-button");
-close_create_cartegory_button.addEventListener("click", function() {
-    var create_category_dummy = document.getElementById("create-category-dummy");
-    create_category_dummy.style.display = "none";
-
-    var create_category = document.getElementById("create-category");
-    create_category.style.display = "none";
-    
-    var input_category = document.getElementById("create-category-name");
-    input_category.value = "";
-})
-
 // 카테고리를 선택하는 부분의 데이터를 업데이트 하는 함수이다.
 function categorySelectUpdate(categoryName) {
     // select 요소를 가지고 온다.
@@ -187,21 +183,41 @@ function categorySelectUpdate(categoryName) {
     select_category.prepend(option);
 }
 
+// 카테고리 추가 화면을 끄는 기능
+document.getElementById("close-create-category-button").addEventListener("click", function() {
+    var create_category_dummy = document.getElementById("create-category-dummy");
+    create_category_dummy.style.display = "none";
+
+    var create_category = document.getElementById("create-category");
+    create_category.style.display = "none";
+    
+    var input_category = document.getElementById("create-category-name");
+    input_category.value = "";
+})
+
 // 글자 수 검사 함수
-function checkString(string, length=160) {
+function checkString(string="", length=160, type="content") {
     /* 글자 수를 검사하여 제한된 수 보다 작으면 앞에 글자만 강조한 뒤
     리턴하고 만약 글자 수를 넘으면 맨 뒤에 ...까지 넣어 리턴한다. */
-    str = '<strong style="font-size: 2em;">' + string[0] + '</strong>' + string.substr(1, length);
-    if (string.length > length) {
-        return str + "...";
+    if (type == "content") {
+        str = '<strong style="font-size: 2em;">' + string[0] + '</strong>' + string.substr(1, length);
+
+        if (string.length > length) {
+            return str + "...";
+        } else {
+            return str;
+        }
     } else {
-        return str;
+        if (string.length > length) {
+            return string.substr(0, length) + "...";
+        } else {
+            return string;
+        }
     }
 }
 
-
-var save = document.getElementById("content-save");
-save.addEventListener("click", saveContent);
+// 작성한 글 저장 버튼
+document.getElementById("content-save").addEventListener("click", saveContent);
 
 // 저장
 function saveContent() {
@@ -238,8 +254,6 @@ function saveContent() {
     
     // 객체 저장
     saveContentData()
-    // 현재까지 저장된 sectionValue 저장
-    localStorage.setItem("sectionValue", ++sectionValue);
 
     /* new-content에 새로운 포스트 저장 */
     // 최근 글 부모 요소 가져오기
@@ -254,7 +268,7 @@ function saveContent() {
     // 최근 글 타이틀 설정
     var new_content_title = document.createElement("div");
     new_content_title.setAttribute("class", "new-content-title");
-    new_content_title.innerText = saveData["title"];
+    new_content_title.innerText = checkString(saveData["title"], 15, "title");
     new_content.appendChild(new_content_title);
 
 
@@ -272,7 +286,7 @@ function saveContent() {
 
     // 첫 번째 글자는 강조를 하고 그 이후 160자 까지만 가져온다.
     // 글자수 검사
-    new_content_content.innerHTML = checkString(saveData["content"]);
+    new_content_content.innerHTML = "&emsp;" + checkString(saveData["content"]);
 
     // 최근 글 타이틀과 본문을 최근 글 자식 요소로 추가한다.
     new_content.appendChild(new_content_content);
@@ -285,6 +299,9 @@ function saveContent() {
     var hr = document.createElement("hr");
     new_contents.appendChild(hr);
 
+
+    // 현재까지 저장된 sectionValue 저장
+    localStorage.setItem("sectionValue", ++sectionValue);
 
     /* 저장이 완료되면 최근 글 페이지로 돌아가고 제목, 카테고리, 내용 부분이 초기화 되며
     이전 페이지로 돌아가게 된다. */
@@ -325,11 +342,21 @@ function createCategory(parent, categoryName) {
     // li 요소의 데이터를 추가할 카테고리의 이름으로 저장한다.
     li.dataset.category = categoryName;
 
+    // 삭제 버튼
+    var category_delete = document.createElement("span");
+    category_delete.setAttribute("class", "category-delete");
+
+    // 삭제 버튼 아이콘
+    var category_delete_icon = document.createElement("i");
+    category_delete_icon.setAttribute("class", "fa fa-times");
+
     // 검색 기능을 만들면 수정 필요
     var a = document.createElement("a");
     a.setAttribute("href", "home.html");
     a.innerText = categoryName;
 
+    category_delete.appendChild(category_delete_icon);
+    li.appendChild(category_delete);
     li.appendChild(a);
     parent.appendChild(li);
 }
@@ -349,9 +376,53 @@ function saveContentData() {
     }
 }
 
+// 글 작성 시 제목의 글자 수가 30자를 넘어가지 않도록 한다.
+document.getElementById("create-title").onkeydown = function() {
+    // 입력받을 최대 글자 수(30자)를 넘어갈 경우 경고창을 내보낸다
+    console.log(event);
+    console.log(event.keyCode);
+    var str = document.getElementById("create-title").value;
+    var maxLength = 30;
+    var strCheck = false;
+
+    // 특정 키는 글자 수를 검사하는데 포함시키지 않는다.
+    if ((event.keyCode == 8 || event.keyCode == 46 || event.keyCode == 16 ||
+        event.keyCode == 17 || event.keyCode == 18 || event.keyCode == 20 ||
+        event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
+        event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 39 ||
+        event.keyCode == 40 || event.keyCode == 36 || event.keyCode == 35 ||
+        event.keyCode == 33 || event.keyCode == 34 || event.keyCode == 45 ||
+        event.keyCode == 145 || event.keyCode == 19 || event.keyCode == 91 ||
+        event.keyCode == 116 || 
+        (event.ctrlKey == true && event.key == 'a') ||
+        (event.ctrlKey == true && event.keyCode == 'w')))
+    {
+        strCheck = false;
+    } else {
+        strCheck = true;
+    }
+
+    if (strCheck && (str.length >= maxLength)) {
+        alert("제목은 30자 이상 작성하실 수 없습니다.");
+        document.getElementById("create-title").value = str.substring(0, maxLength);
+    }
+}
+
+window.addEventListener("mouseup", function() {
+    if (this.event.button == 3) {
+        prevPage();
+    }
+})
 
 /* 본문 페이지 */
 function getContent(value) {
-    console.log(value);
     movePage('content');
+    var content = JSON.parse(localStorage.getItem("contents"))[value];
+
+    // 본문 페이지의 타이틀, 본문 요소를 가지고 온다.
+    var content_title = document.getElementById("content-title");
+    var content_content = document.getElementById("content-content");
+
+    content_title.innerText = content["title"];
+    content_content.innerHTML = content["html"];
 }

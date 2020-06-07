@@ -12,6 +12,8 @@ var currentPage = pagesData[0];
 
 // 페이지 이동 함수
 function movePage(nextPageKey) {
+    /* keys: new, create, search, content */
+    
     // 다음 페이지에 맞는 값을 가져온다.
     var nextPage = pages[nextPageKey];
 
@@ -32,14 +34,15 @@ function movePage(nextPageKey) {
 // 이전 페이지로 돌아가는 함수
 function prevPage() {
     /* pagesData의 맨 뒤의 값(현재 페이지)을 가져와 페이지가 보이지 않도록 설정한다. */
-    var cur = document.getElementById(pageClear(pagesData.pop()));
-    cur.style.display = "none";
+    if (pagesData.length > 1) {
+        var cur = document.getElementById(pageClear(pagesData.pop()));
+        cur.style.display = "none";
 
-    /* pagesData에 있는 마지막 값(이전 페이지)을 가져와 페이지가 보이도록 설정한다. */
-    PrevPage = pagesData[pagesData.length - 1];
-    var prev = document.getElementById(PrevPage);
-    prev.style.display = "block";
-
+        /* pagesData에 있는 마지막 값(이전 페이지)을 가져와 페이지가 보이도록 설정한다. */
+        prev_page = pagesData[pagesData.length - 1];
+        var prev = document.getElementById(prev_page);
+        prev.style.display = "block";
+    }
 }
 
 // 페이지 이동 시 페이지 내에서 비워야 할 부분이 있으면 지우는 함수

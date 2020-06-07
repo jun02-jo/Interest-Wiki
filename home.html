@@ -16,7 +16,7 @@
                 </span>
 
                 <div id="search">
-                    <input id="search-text" type="text" placeholder="제목, 카테고리 입력">
+                    <input id="search-text" type="text" placeholder="제목 입력">
                     <button id="search-button" onclick="testFunc()">
                         <i class="fa fa-search"></i>
                     </button>
@@ -33,12 +33,21 @@
                     <ul id="show-categories">
                         <!-- 미리보기 부분입니다. -->
                         <!-- <li class="category-content">
+                            <span class="category-delete">
+                                <i class="fa fa-times"></i>
+                            </span>
                             <a href="home.html">스포츠</a>
                         </li>
                         <li class="category-content">
+                            <span class="category-delete">
+                                <i class="fa fa-times"></i>
+                            </span>
                             <a href="home.html">게임</a>
                         </li>
                         <li class="category-content">
+                            <span class="category-delete">
+                                <i class="fa fa-times"></i>
+                            </span>
                             <a href="home.html">영화</a>
                         </li> -->
                         <!-- 미리보기 부분입니다. -->
@@ -167,10 +176,10 @@
 
                 <arcitle id="main-content">
                     <!-- 본문 페이지 -->
+                    <button class="prev" onclick="prevPage()"><</button>
                     <div id="content-head">
                         <!-- 미리보기 부분입니다. -->
-                        <button class="prev" onclick="prevPage()"><</button>
-                        <div id="content-title">Title</div>
+                        <div id="content-title"></div>
                         <div id="content-buttons">
                             <button class="content-update-button">수정</button>
                             <button class="content-delete-button">삭제</button>
@@ -179,10 +188,44 @@
                     </div>
                     <div id="content-nav">
                         <div id="content-toc">목차</div>
-                        <ul id="content-toc-nav"></ul>
+                        <ul id="content-toc-nav">
+                            <!-- 미리보기 부분입니다. -->
+                            <li>
+                                <a href="#" style="color: #04046d;">
+                                    1. ~~~
+                                </a>
+                            </li>
+                            <li style="margin-left: 0.5em;">
+                                <a href="#" style="color: #04046d;">
+                                    1.1 ~~~
+                                </a>
+                            </li>
+                            <li style="margin-left: 0.5em;">
+                                <a href="#" style="color: #04046d;">
+                                    1.2 ~~~
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" style="color: #04046d;">
+                                    2. ~~~
+                                </a>
+                            </li>
+                            <li style="margin-left: 0.5em;">
+                                <a href="#" style="color: #04046d;">
+                                    2.1 ~~~
+                                </a>
+                            </li>
+                            <!-- 미리보기 부분입니다. -->
+                        </ul>
                     </div>
                     <div id="content-body">
-                        
+                        <!-- 미리보기 부분입니다. -->
+                        <p id="content-content"></p>
+                        <!-- Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                        Deleniti, aspernatur ullam minima quasi enim iste ab dolorem,
+                        nobis incidunt nostrum placeat natus aperiam omnis mollitia modi
+                        quod soluta optio. Nisi. -->
+                        <!-- 미리보기 부분입니다. -->
                     </div>
                 </arcitle>
             </section>
