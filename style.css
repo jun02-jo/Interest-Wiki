@@ -67,7 +67,34 @@ header {
 #search-text {
     height: 2em;
     float: left;
-    padding: 2px;
+    padding: 2px 7px;
+}
+
+#search .wrong{
+    outline-color: red;
+    outline-width: 10px;
+    animation: wrong .65s ease-out;
+}
+
+@keyframes wrong {
+    0% {
+        transform: scale(1.2);
+    }
+    20% {
+        transform: scale(1.05);
+    }
+    30% {
+        transform: scale(1.1);
+    }
+    40% {
+        transform: scale(1.05);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    90% {
+        transform: scale(1);
+    }
 }
 
 #search-button {
@@ -105,6 +132,7 @@ aside {
 .category-content {
     margin-top: 0.3em;
     padding-left: 0.3em;
+    cursor: pointer;
 }
 
 .category-delete i {
@@ -384,21 +412,6 @@ aside {
 }
 
 
-/* 검색 페이지 */
-#main-search-screen {
-    display: none;
-    width: 100%;
-    height: 100%;
-}
-
-/* 본문 페이지 */
-#main-content {
-    display: none;
-    width: 100%;
-    height: 100%;
-}
-
-
 /* 페이지 버튼들 */
 #pages ul {
     display: flex;
@@ -477,11 +490,78 @@ aside {
     font-size: 1.2em;
 }
 
+
 /* 검색 페이지 */
 #main-search-screen {
     display: none;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 2em;
 }
 
+/* 검색하는 값 */
+#result {
+    font-size: 1.4em;
+    font-weight: bolder;
+}
+
+#search-title {
+    font-size: 2em;
+    font-weight: bold;
+    padding: 0.5em 1em 1em 1em;
+}
+
+#search-title::after {
+    content: '';
+    float: right;
+    padding-top: 0.25em;
+    border-bottom: 3px dashed black;
+    width: 100%;
+    height: 10px;
+}
+
+/* 검색된 내용 */
+.searched-content {
+    clear: both;
+    padding: 1em 3em 1.5em 3em;
+    cursor: pointer;
+    transition: .25s ease-in-out;
+    margin-right: 9px;
+}
+
+.searched-content:hover {
+    transform: scale(1.015) translateY(2px);
+}
+
+.searched-content::after {
+    content: '';
+    float: right;
+    padding-top: 0.25em;
+    border-bottom: 2px solid black;
+    width: 100%;
+    height: 10px;
+}
+
+/* 검색된 내용의 제목 */
+.searched-content-title {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* 제목과 카테고리 중간의 붙임표 */
+/* 검색된 내용의 카테고리 */
+.searched-dash, .searched-content-category {
+    font-size: 0.8em;
+    font-weight: 300;
+    color: #474747;
+}
+
+/* 검색된 내용의 내용 */
+.searched-content-content {
+    font-size: 1.15em;
+    margin-top: 0.3em;
+}
 
 /* 본문 페이지 */
 #main-content {
@@ -508,8 +588,8 @@ aside {
 /* 뒤로가기 버튼 */
 .prev {
     margin-top: 10px;
-    margin-left: 20px;
-    font-size: 1.7em;
+    margin-left: 10px;
+    font-size: 1.5em;
     font-weight: bold;
     border: none;
     background-color: transparent;

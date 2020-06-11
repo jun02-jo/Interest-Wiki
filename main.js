@@ -16,6 +16,7 @@ function initData() {
 
     if (localStorage.getItem("categories") != null) {
         getCategories();
+        loadCategories();
     }
 }
 
@@ -33,6 +34,7 @@ function getCategories() {
         
         var li = document.createElement("li");
         li.setAttribute("class", "category-content");
+        li.dataset.category = category;
 
         // 삭제 버튼
         var category_delete = document.createElement("span");
@@ -42,10 +44,7 @@ function getCategories() {
         var category_delete_icon = document.createElement("i");
         category_delete_icon.setAttribute("class", "fa fa-times");
 
-        // 임시
         var span = document.createElement("span");
-        // span.setAttribute("href", "home.html");
-        span.dataset.category = category;
         span.innerText = category;
 
         category_delete.appendChild(category_delete_icon);
@@ -122,6 +121,7 @@ function setCategories() {
 
         var list = document.createElement("li");
         list.setAttribute("class", "category-content");
+        li.dataset.category = categoryValue;
 
         // 검색 기능이 추가되면 수정 필요
         var a = document.createElement("a");
@@ -305,6 +305,7 @@ function saveContent() {
     // 현재까지 저장된 sectionValue 저장
     localStorage.setItem("sectionValue", ++sectionValue);
 
+    loadCategories();
     /* 저장이 완료되면 최근 글 페이지로 돌아가고 제목, 카테고리, 내용 부분이 초기화 되며
     이전 페이지로 돌아가게 된다. */
     prevPage();
@@ -354,8 +355,6 @@ function createCategory(parent, categoryName) {
 
     // 검색 기능을 만들면 수정 필요
     var span = document.createElement("span");
-    // span.setAttribute("href", "home.html");
-    span.dataset.category = categoryName;
     span.innerText = categoryName;
 
     category_delete.appendChild(category_delete_icon);
@@ -431,4 +430,110 @@ function getContent(value) {
 
     content_title.innerText = content["title"];
     content_content.innerHTML = content["html"];
+}
+
+
+/* 검색 기능 */
+document.getElementById("search-button").addEventListener("click", function() {
+    var search_text = document.getElementById("search-text");
+    var value = search_text.value;
+    if (value == "") {
+        // 입력칸이 비어있을 경우 알려준다.
+        search_text.focus();
+        search_text.setAttribute("class", "wrong");
+        search_text.placeholder = "제목을 입력하세요!";
+        setTimeout(function() {
+            search_text.removeAttribute("class");
+            search_text.placeholder = "제목 입력";
+        }, 650);
+    } else {
+        searchContent(value, "title");
+    }
+});
+
+// 각 카테고리에 이벤트를 추가한다.
+function loadCategories() {
+    var search_category = document.getElementsByClassName("category-content");
+    [].forEach.call(search_category, function(category) {
+        category.addEventListener("click", function() {
+            searchContent(category.dataset.category, "category");
+        })
+    })
+}
+
+function searchContent(value, whatSearch) {
+    // 페이지 이동
+    pageClear(pages['search']);
+    movePage('search');
+
+    // 검색 값을 알려준다.
+    var search_title = document.getElementById("search-title");
+    search_title.innerHTML = "<span id='result'>검색결과</span>"
+
+    if (whatSearch == "title") {
+        search_title.innerHTML += " 제목" + " - " + value;
+    } else if (whatSearch == "category") {
+        search_title.innerHTML += " 카테고리" + " - " + value;
+    }
+
+    // 저장된 글들을 가지고 온다.
+    var contents = JSON.parse(localStorage.getItem("contents"));
+    // 검색할 값과 일치하는 값들을 가지고 온다.
+    if(whatSearch == "title") {
+        for (var content in contents) {
+            if (contents[content]["title"].indexOf(value) != -1) {
+                addSearchedContent(contents[content], content);
+            }
+        }
+    } else  if(whatSearch == "category") {
+        for (var content in contents) {
+            if (contents[content]["category"] == value) {
+                addSearchedContent(contents[content], content);
+            }
+        }
+    }
+
+    document.getElementById("search-text").value = "";
+}
+
+function addSearchedContent(content, index) {
+    // 부모 요소
+    var searched = document.getElementById("searched");
+
+    // 요소 추가
+
+    var li = document.createElement("li");
+    li.setAttribute("class", "searched-content");
+    li.setAttribute("onclick", "getContent(" + index + ")");
+
+    // 검색된 내용의 제목 설정
+    var searched_content_title = document.createElement("div");
+    searched_content_title.setAttribute("class", "searched-content-title");
+    searched_content_title.innerText = content["title"] + " ";
+
+    // 제목과 카테고리 중간의 붙임표
+    var searched_dash = document.createElement("span")
+    searched_dash.setAttribute("class", "searched-dash");
+    searched_dash.innerText = "-";
+
+    // 검색된 내용의 카테고리 설정
+    var searched_content_category = document.createElement("span");
+    searched_content_category.setAttribute("class", "searched-content-category");
+    if (content["category"] == "none") {
+        searched_content_category.innerText = " " + "카테고리 없음";
+    } else {
+        searched_content_category.innerText = " " + content["category"];
+    }
+    
+
+    // 검색된 내용의 내용 설정
+    var searched_content_content = document.createElement("div");
+    searched_content_content.setAttribute("class", "searched-content-content");
+    searched_content_content.innerHTML = "&emsp;&emsp;" + checkString(content["content"], 100, "searched-content");
+    
+    searched_content_title.appendChild(searched_dash);
+    searched_content_title.appendChild(searched_content_category);
+    li.appendChild(searched_content_title);
+    li.appendChild(searched_content_content);
+    searched.appendChild(li);
 }

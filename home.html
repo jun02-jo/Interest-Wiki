@@ -17,7 +17,7 @@
 
                 <div id="search">
                     <input id="search-text" type="text" placeholder="제목 입력">
-                    <button id="search-button" onclick="testFunc()">
+                    <button id="search-button">
                         <i class="fa fa-search"></i>
                     </button>
                 </div>
@@ -44,11 +44,11 @@
                             </span>
                             <a href="home.html">게임</a>
                         </li>
-                        <li class="category-content">
+                        <li class="category-content" data-category="movie">
                             <span class="category-delete">
                                 <i class="fa fa-times"></i>
                             </span>
-                            <a href="home.html">영화</a>
+                            <span>영화</span>
                         </li> -->
                         <!-- 미리보기 부분입니다. -->
                     </ul>
@@ -171,7 +171,38 @@
                 </article>
 
                 <article id="main-search-screen">
+                    <button class="prev" onclick="prevPage()"><</button>
                     <!-- 검색 페이지 -->
+                    <div id="search-title">
+                        <span id="result"></span>
+                        <!-- AAA 검색결과 -->
+                    </div>
+                    <!-- 미리보기 부분입니다. -->
+                    <ul id="searched">
+                        <!-- <li class="searched-content">
+                            <div class="searched-content-title">
+                                Title <span class="searched-dash">-</span> <span class="searched-content-category">영화</span>
+                            </div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li>
+                        <li class="searched-content">
+                            <div class="searched-content-title">Title</div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li>
+                        <li class="searched-content">
+                            <div class="searched-content-title">Title</div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li>
+                        <li class="searched-content">
+                            <div class="searched-content-title">Title</div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li>
+                        <li class="searched-content">
+                            <div class="searched-content-title">Title</div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li> -->
+                    </ul>
+                    <!-- 미리보기 부분입니다. -->
                 </article>
 
                 <arcitle id="main-content">
