@@ -12,12 +12,12 @@
         <header>
             <h1>
                 <span class="header-title">
-                    <a href="#">관심사 위키</a>
+                    <a href="home.html">관심사 위키</a>
                 </span>
 
                 <div id="search">
-                    <input id="search-text" type="text" placeholder="제목, 카테고리 입력">
-                    <button id="search-button" onclick="testFunc()">
+                    <input id="search-text" type="text" placeholder="제목 입력">
+                    <button id="search-button">
                         <i class="fa fa-search"></i>
                     </button>
                 </div>
@@ -26,36 +26,50 @@
 
         <div id="content">
             <aside>
-                <div id="cartegory">
-                    <h3 id="cartegory-title">카테고리</h3>
+                <div id="category">
+                    <h3 id="category-title">카테고리</h3>
                     <hr>
 
-                    <ul>
+                    <ul id="show-categories">
                         <!-- 미리보기 부분입니다. -->
-                        <li class="cartegory-content">
-                            <a href="#">스포츠</a>
+                        <!-- <li class="category-content">
+                            <span class="category-delete">
+                                <i class="fa fa-times"></i>
+                            </span>
+                            <a href="home.html">스포츠</a>
                         </li>
-                        <li class="cartegory-content">
-                            <a href="#">게임</a>
+                        <li class="category-content">
+                            <span class="category-delete">
+                                <i class="fa fa-times"></i>
+                            </span>
+                            <a href="home.html">게임</a>
                         </li>
-                        <li class="cartegory-content">
-                            <a href="#">영화</a>
-                        </li>
+                        <li class="category-content" data-category="movie">
+                            <span class="category-delete">
+                                <i class="fa fa-times"></i>
+                            </span>
+                            <span>영화</span>
+                        </li> -->
                         <!-- 미리보기 부분입니다. -->
                     </ul>
                 </div>
             </aside>
 
             <section id="main">
-                <article id="main-new-contents">
+                <article id="main-new-content">
                     <!-- 최근 글을 알려주는 페이지 -->
                     <h2>최근 글</h2>
                     <hr>
                     
                     <div id="new-contents">
                         <!-- 미리보기 부분입니다. -->
-
-                        <div class="new-content" onclick="getContent()">
+                        <!-- <div class="new-content" data-index="0">
+                            <div class="new-content-title">Title</div>
+                            <p class="new-content-content"><strong style="font-size: 2em;">L</strong>orem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam explicabo similique reiciendis tenetur, officia distinctio aut, iste reprehenderit numquam quia sunt itaque! Ducimus, illo sunt laboriosam facilis quibusdam quos minima.</p>
+                            <hr>
+                        </div> -->
+                        
+                        <!-- <div class="new-content" onclick="getContent()">
                             <div class="new-content-title">Title</div>
                             <p class="new-content-content"><strong style="font-size: 2em;">L</strong>orem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam explicabo similique reiciendis tenetur, officia distinctio aut, iste reprehenderit numquam quia sunt itaque! Ducimus, illo sunt laboriosam facilis quibusdam quos minima.</p>
                         </div>
@@ -77,21 +91,14 @@
                             <div class="new-content-title">Title</div>
                             <p class="new-content-content"><strong style="font-size: 2em;">L</strong>orem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam explicabo similique reiciendis tenetur, officia distinctio aut, iste reprehenderit numquam quia sunt itaque! Ducimus, illo sunt laboriosam facilis quibusdam quos minima.</p>
                         </div>
-                        <hr>
-                        
-                        <div class="new-content" onclick="getContent()">
-                            <div class="new-content-title">Title</div>
-                            <p class="new-content-content"><strong style="font-size: 2em;">L</strong>orem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam explicabo similique reiciendis tenetur, officia distinctio aut, iste reprehenderit numquam quia sunt itaque! Ducimus, illo sunt laboriosam facilis quibusdam quos minima.</p>
-                        </div>
-                        <hr>
-
+                        <hr> -->
                         <!-- 미리보기 부분입니다. -->
                     </div>
 
-                    <div id="pages">
-                        <ul>
+                    <!-- <div id="pages">
+                        <ul> -->
                             <!-- 미리보기 부분입니다. -->
-                            <li>
+                            <!-- <li>
                                 <a href="#"><</a>
                             </li>
                             <li>
@@ -111,10 +118,10 @@
                             </li>
                             <li>
                                 <a href="#">></a>
-                            </li>
+                            </li> -->
                             <!-- 미리보기 부분입니다. -->
-                        </ul>
-                    </div>
+                        <!-- </ul>
+                    </div> -->
                     
                     <div id="create">
                         <button id="create-button" onclick="movePage('create')">
@@ -130,9 +137,20 @@
                         <div id="create-head">
                             <button class="prev" onclick="prevPage()"><</button>
                             <input type="text" id="create-title" placeholder="제목">
-                            <select name="" id="create-cartegory">
-                                <option value="">카테고리 추가</option>
+                            <!-- 카테고리 선택 -->
+                            <select id="select-category">
+                                <option id="category-none" value="none">카테고리 없음</option>
                             </select>
+                            <button id="create-category-button">카테고리 추가</button>
+                            <!-- 카테고리 추가 -->
+                            <div id="create-category-dummy"></div>
+                            <div id="create-category">
+                                <div id="close-create-category">
+                                    <span id="close-create-category-button">X</span>
+                                </div>
+                                <input type="text" id="create-category-name" placeholder="카테고리 입력">
+                                <button id="create-new-category">추가</button>
+                            </div>
                         </div>
                         <div id="create-body">
                             <div id="create-commands">
@@ -147,22 +165,134 @@
                             <div id="create-content" contenteditable="true"></div>
                         </div>
                         <div id="create-foot">
-                            <button class="content-save" onclick="saveContent()">저장</button>
+                            <button id="content-save">저장</button>
                         </div>
                     </div>
                 </article>
 
+                <!-- 수정 페이지 -->
+                <article id="update-screen">
+                    <div id="update-form">
+                        <div id="update-head">
+                            <div id="update-title" contenteditable="true"></div>
+                        </div>
+                        <div id="update-body">
+                            <div id="update-commands">
+                                <button class="update-command bold" onclick="document.execCommand('bold')">
+                                    <b>굵게</b>
+                                </button>
+                                <button class="update-command italic" onclick="document.execCommand('italic')">
+                                    <i>기울이기</i>
+                                </button>
+                                <!-- ... -->
+                            </div>
+                            <div id="update-content" contenteditable="true"></div>
+                        </div>
+                        <div id="update-foot">
+                            <button id="cancel">취소하기</button>
+                            <button id="content-update">수정하기</button>
+                        </div>
+                    </div>
+                </article>
+
+
+
+
+
+
                 <article id="main-search-screen">
+                    <button class="prev" onclick="prevPage()"><</button>
                     <!-- 검색 페이지 -->
+                    <div id="search-title">
+                        <span id="result"></span>
+                        <!-- AAA 검색결과 -->
+                    </div>
+                    <!-- 미리보기 부분입니다. -->
+                    <ul id="searched">
+                        <!-- <li class="searched-content">
+                            <div class="searched-content-title">
+                                Title <span class="searched-dash">-</span> <span class="searched-content-category">영화</span>
+                            </div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li>
+                        <li class="searched-content">
+                            <div class="searched-content-title">Title</div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li>
+                        <li class="searched-content">
+                            <div class="searched-content-title">Title</div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li>
+                        <li class="searched-content">
+                            <div class="searched-content-title">Title</div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li>
+                        <li class="searched-content">
+                            <div class="searched-content-title">Title</div>
+                            <div class="searched-content-content">&emsp;&emsp;asdfasdfasdfasdf...</div>
+                        </li> -->
+                    </ul>
+                    <!-- 미리보기 부분입니다. -->
                 </article>
 
                 <arcitle id="main-content">
                     <!-- 본문 페이지 -->
+                    <button class="prev" onclick="prevPage()"><</button>
+                    <div id="content-head">
+                        <!-- 미리보기 부분입니다. -->
+                        <div id="content-title"></div>
+                        <div id="content-buttons">
+                            <button id="content-update-button">수정</button>
+                            <button id="content-delete-button">삭제</button>
+                        </div>
+                        <!-- 미리보기 부분입니다. -->
+                    </div>
+                    <div id="content-nav">
+                        <div id="content-toc">목차</div>
+                        <ul id="content-toc-nav">
+                            <!-- 미리보기 부분입니다. -->
+                            <li>
+                                <a href="#" style="color: #04046d;">
+                                    1. ~~~
+                                </a>
+                            </li>
+                            <li style="margin-left: 0.5em;">
+                                <a href="#" style="color: #04046d;">
+                                    1.1 ~~~
+                                </a>
+                            </li>
+                            <li style="margin-left: 0.5em;">
+                                <a href="#" style="color: #04046d;">
+                                    1.2 ~~~
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" style="color: #04046d;">
+                                    2. ~~~
+                                </a>
+                            </li>
+                            <li style="margin-left: 0.5em;">
+                                <a href="#" style="color: #04046d;">
+                                    2.1 ~~~
+                                </a>
+                            </li>
+                            <!-- 미리보기 부분입니다. -->
+                        </ul>
+                    </div>
+                    <div id="content-body">
+                        <!-- 미리보기 부분입니다. -->
+                        <p id="content-content"></p>
+                        <!-- Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                        Deleniti, aspernatur ullam minima quasi enim iste ab dolorem,
+                        nobis incidunt nostrum placeat natus aperiam omnis mollitia modi
+                        quod soluta optio. Nisi. -->
+                        <!-- 미리보기 부분입니다. -->
+                    </div>
                 </arcitle>
             </section>
         </div>
     </div>
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="changePage.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
