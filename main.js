@@ -307,6 +307,7 @@ function saveContent() {
     saveData["category"] = create_category;
     saveData["content"] = convertContent(create_content);
     saveData["html"] = contentParsing(create_content_html);
+    console.log(saveData["html"]);
     
     // 객체 저장
     saveContentData()
@@ -471,13 +472,67 @@ window.addEventListener("mouseup", function() {
 
 /* 본문 페이지 */
 function getContent(value) {
+    var toc = {
+        big: "toc-big",
+        small: "toc-small",
+        line: "toc-line"
+    };
     movePage('content');
     // 해당 내용을 가지고 온다.
     var content = JSON.parse(localStorage.getItem("contents"))[value];
-
-    // 목차 부분을 설정한다.
-    console.log(content);
     console.log(content["html"]);
+
+    // 목차를 설정하는 함수
+    function setToc() {
+        console.log("목차 설정");
+        var parent = document.getElementById("content-toc-nav");
+        if (parent != null) {
+            parent.remove();
+        }
+
+        var tocContent = JSON.parse(content["html"]);
+        var tocBig = 0;
+        var tocSmall = 0;
+
+        var content_nav = document.getElementById("content-nav");
+        // 목차를 추가할 부모 요소
+        var content_toc_nav = document.createElement("ul");
+        content_toc_nav.setAttribute("id", "content-toc-nav");
+
+        // toc[i]: [class, name, content]
+        for (var i = 0; i < tocContent.length; i++) {
+            if (tocContent[i][0] != toc.line) {
+                var value_class = tocContent[i][0];
+                var value_name = tocContent[i][1];
+                var value_content = tocContent[i][2];
+
+                // 목차나 중목차일 경우에만 목차에 추가한다.
+                // li 요소 추가
+                var toc_li = document.createElement("li");
+                var toc_a = document.createElement("a");
+
+                if (value_class == toc.big) {
+                    toc_li.setAttribute("class", value_class + " " + ++tocBig);
+                    tocSmall = 0;
+
+                    toc_a.setAttribute("href", "#" + value_name);
+                    toc_a.setAttribute("name", "toc-" + value_name);
+                    toc_a.innerText = tocBig + ". " + value_content;
+                } else if (value_class == toc.small){
+                    toc_li.setAttribute("class", value_class + " " + ++tocSmall);
+
+                    toc_a.setAttribute("href", "#" + value_name);
+                    toc_a.setAttribute("name", "toc-" + value_name);
+                    toc_a.innerText = tocBig + "." + tocSmall + " " + value_content;
+                }
+
+                toc_li.appendChild(toc_a);
+                content_toc_nav.appendChild(toc_li);
+            }
+        }
+        content_nav.appendChild(content_toc_nav);
+        console.log(content_toc_nav);
+    }
     setToc();
 
     var content_head = document.getElementById("content-head");
@@ -485,21 +540,90 @@ function getContent(value) {
 
     // 본문 페이지의 타이틀, 본문 요소를 가지고 온다.
     var content_title = document.getElementById("content-title");
-    var content_content = document.getElementById("content-body");
+    var content_body = document.getElementById("content-body");
 
     content_title.innerText = content["title"];
-    content_content.innerHTML = content["html"];
+    // content_content.innerHTML = content["html"];
     // html을 검사하여 목차를 어떻게 잘 만든다.
-    
-    // 목차를 설정하는 함수
-    function setToc() {
-        // 목차를 추가할 부모 요소
-        var content_toc_nav = document.getElementById("content-toc-nav");
+    setContent();
+    function setContent() {
+        var parent = document.getElementById("content-content");
+        if (parent != null) {
+            parent.remove();
+        }
 
-        var toc_li = document.createElement("li");
-        var toc_a = document.createElement("a");
+        var contentList = JSON.parse(content["html"]);
+        var contentLine = 1;
+        var tocBig = 0;
+        var tocSmall = 0;
+
+        // 전체 내용의 부모요소
+        var content_content = document.createElement("div");
+        content_content.setAttribute("id", "content-content");
+
+        for (var i = 0; i < contentList.length; i++) {
+            var value_class = contentList[i][0];
+            var value_name = contentList[i][1];
+            var value_content = contentList[i][2];
+
+            console.log(contentList[i]);
+            if (value_class == toc.line) {
+                console.log(value_class);
+                console.log(value_content);
+                var content_div = document.createElement("div");
+                content_div.setAttribute("class", value_class + " " + contentLine++);
+                content_div.innerHTML = value_content;
+                
+                content_content.appendChild(content_div);
+            } else if (value_class == toc.big) {
+                var content_a = document.createElement("a");
+                content_a.setAttribute("class", value_class + " " + ++tocBig);
+                content_a.setAttribute("href", "#" + "content-nav");
+                content_a.setAttribute("id", value_name);
+                //ex) <div class="toc-big 1"></div>
+
+                var span = document.createElement("span");
+                span.setAttribute("class", value_class + "-number");
+                span.innerText = tocBig + ".";
+                /*ex) <div class="toc-big 1">
+                    <span class="toc-big-number">1.</span>
+                </div> */
+
+                content_a.appendChild(span);
+                content_a.innerHTML += " " + value_content;
+                /*ex) <div class="toc-big 1">
+                    <span class="toc-big-number">1.</span> 내용
+                </div> */
+                tocSmall = 0;                   
+
+                content_content.appendChild(content_a);             
+            } else if (value_class == toc.small) {
+                var content_a = document.createElement("a");
+                content_a.setAttribute("class", value_class + " " + ++tocSmall);
+                content_a.setAttribute("href", "#" + "content-nav");
+                content_a.setAttribute("id", value_name);
+                //ex) <div class="toc-small 1"></div>
+
+                var span = document.createElement("span");
+                span.setAttribute("class", value_class + "-number");
+                span.innerText = tocBig + "." + tocSmall;
+                /*ex) <div class="toc-small 1">
+                    <span class="toc-small-number">1.1</span>
+                </div> */
+
+                content_a.appendChild(span);
+                content_a.innerHTML += " " + value_content;
+                console.log(content_a.innerHTML);
+                /*ex) <div class="toc-small 1">
+                    <span class="toc-small-number">1.1</span> 내용
+                </div> */
+
+                content_content.appendChild(content_a);
+            }
+        }
+        content_body.appendChild(content_content);
+        console.log(content_body);
     }
-
 }
 
 
@@ -650,14 +774,55 @@ function contentParsing(parsingString) {
         big: "toc-big",
         small: "toc-small",
         line: "toc-line"
-    }
+    };
     // 인자로 들어온 문자열을 복사하여 가져온다.
     var useStr = parsingString;
-    var parsedContent = document.createElement("div");
+    // var parsedContent = document.createElement("div");
+    var parsedContent = [];
     // 입력된 글자를 가져올 변수
     var inputText = "";
-    // 목차를 제외한 내용의 개수를 나타내는 변수
-    var contentCount = 1;
+
+    // 리스트를 추가하는 함수
+    function appendContent(input, type) {
+        var elementClass = "";
+        var elementName = "";
+        var elementContent = input;
+        var element = [];
+        
+        if (type == toc.line) {
+            elementClass = type;
+            element.push(elementClass, elementName, elementContent);
+        } else {
+            elementClass = type;
+            elementName = input;
+            element.push(elementClass, elementName, elementContent);
+        }
+
+        parsedContent.push(element);
+
+
+        // var tocElement = document.createElement("div");
+        // if (type == toc.line) {
+        //     tocElement.setAttribute("class", type + contentCount++);
+        // } else {
+        //     tocElement.setAttribute("class", type);
+        //     tocElement.setAttribute("name", input);
+        // }
+        // tocElement.innerHTML = input;
+        // parsedContent.appendChild(tocElement);
+    }
+
+    // function appendContent(input, type) {
+    //     var tocElement = document.createElement("div");
+    //     if (type == toc.line) {
+    //         tocElement.setAttribute("class", type + contentCount++);
+    //     } else {
+    //         tocElement.setAttribute("class", type);
+    //         tocElement.setAttribute("name", input);
+    //     }
+    //     tocElement.innerHTML = input;
+    //     parsedContent.appendChild(tocElement);
+    // }
 
     // 사용할 문자열이 다 비워질 때 까지 파싱한다.
     console.log("first:" + useStr);
@@ -812,17 +977,6 @@ function contentParsing(parsingString) {
         }
     }
 
-    function appendContent(input, type) {
-        var tocElement = document.createElement("div");
-        if (type == toc.line) {
-            tocElement.setAttribute("class", type + contentCount++);
-        } else {
-            tocElement.setAttribute("class", type);
-            tocElement.setAttribute("name", input);
-        }
-        tocElement.innerHTML = input;
-        parsedContent.appendChild(tocElement);
-    }
-
-    return parsedContent.innerHTML;
+    return JSON.stringify(parsedContent);
+    // return parsedContent.innerHTML;
 }

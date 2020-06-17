@@ -654,6 +654,10 @@ aside {
     margin-top: 0.5em;
 }
 
+#content-toc-nav .toc-small {
+    margin-left: 0.5em;
+}
+
 
 /* 본문 페이지 본문 부분 */
 #content-body {
