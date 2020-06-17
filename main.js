@@ -134,7 +134,42 @@ function setCategories() {
 }
 
 
-/* 생성 부분 */
+/* 생성(글 작성) 부분 */
+
+// 글 작성 페이지 이동을 위한 부분
+document.getElementById("create-button").addEventListener("click", function() {
+    movePage('create');
+    loadCommandButtonFunc();
+})
+
+// 글 작성 버튼(굵게, 기울이기 등)을 눌렀을 때
+// 목차 혹은 중목차일 경우 굵게, 기울이기 등을 막기 위한 함수
+function loadCommandButtonFunc() {
+    var commands = document.getElementsByClassName("create-command");
+    [].forEach.call(commands, function(command) {
+        command.addEventListener("click", function() {
+            // bold일 경우 
+            //  this.classList: ["create-command", "bold", value: "create-command bold"]
+            // italic일 경우
+            //  this.classList: ["create-command", "italic", value: "create-command italic"]
+            var buttonType = this.classList[1];
+            console.log(buttonType);
+            var selectedText = window.getSelection().getRangeAt(0).toString();
+
+            if (buttonType == "bold" || buttonType == "italic")  {
+                if (selectedText.indexOf("===") != -1 || selectedText.indexOf("==") != -1) {
+                    alert("목차나 중목차는 수정하실 수 없습니다.");
+                    return;
+                } else {
+                    document.execCommand(buttonType);
+                }
+            } else {
+                // document.execCommand(buttonType);
+            }
+        })
+    })
+}
+
 // 카테고리 추가 버튼을 눌렀을 때
 document.getElementById("create-category-button").addEventListener("click", function() {
     // 카테고리 추가 화면을 보이도록 설정한다.
@@ -143,10 +178,22 @@ document.getElementById("create-category-button").addEventListener("click", func
 
     var create_category = document.getElementById("create-category");
     create_category.style.display = "block";
+
+    document.getElementById("create-category-name").focus();
 });
 
 // 카테고리 추가하는 함수
-document.getElementById("create-new-category").addEventListener("click", function () {
+// 엔터키 누름
+document.getElementById("create-category-name").onkeydown = function() {
+    if (event.keyCode == 13) {
+        addCategoryFunc();
+    }
+}
+
+// 버튼 클릭
+document.getElementById("create-new-category").addEventListener("click", addCategoryFunc);
+
+function addCategoryFunc() {
     // 카테고리 추가 화면을 보이지 않도록 설정한다.
     var create_category_dummy = document.getElementById("create-category-dummy");
     create_category_dummy.style.display = "none";
@@ -171,7 +218,7 @@ document.getElementById("create-new-category").addEventListener("click", functio
         categorySelectUpdate(category_name);
         return;
     }
-});
+}
 
 // 카테고리를 선택하는 부분의 데이터를 업데이트 하는 함수이다.
 function categorySelectUpdate(categoryName) {
@@ -236,6 +283,11 @@ function saveContent() {
     var create_content = content.innerText;
     var create_content_html = content.innerHTML;
 
+    // 타이틀의 글자 수를 검사한다.
+    if (titleStrLengthCheck()) {
+        return;
+    }
+
     /* 만약 비어있는 경우에 저장을 누르면 이상하게 작동하므로
     경고 문구를 띄워준다. */
     if (create_title == "") {
@@ -253,8 +305,8 @@ function saveContent() {
     // 제목, 카테고리, 내용을 객체로 저장함
     saveData["title"] = create_title;
     saveData["category"] = create_category;
-    saveData["content"] = create_content;
-    saveData["html"] = create_content_html;
+    saveData["content"] = convertContent(create_content);
+    saveData["html"] = contentParsing(create_content_html);
     
     // 객체 저장
     saveContentData()
@@ -383,12 +435,8 @@ document.getElementById("create-title").onkeydown = function() {
     // 입력받을 최대 글자 수(30자)를 넘어갈 경우 경고창을 내보낸다
     // console.log(event);
     // console.log(event.keyCode);
-    var str = document.getElementById("create-title").value;
-    var maxLength = 30;
-    var strCheck = false;
-
     // 특정 키는 글자 수를 검사하는데 포함시키지 않는다.
-    if ((event.keyCode == 8 || event.keyCode == 46 || event.keyCode == 16 ||
+    if (!(event.keyCode == 8 || event.keyCode == 46 || event.keyCode == 16 ||
         event.keyCode == 17 || event.keyCode == 18 || event.keyCode == 20 ||
         event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
         event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 39 ||
@@ -396,17 +444,22 @@ document.getElementById("create-title").onkeydown = function() {
         event.keyCode == 33 || event.keyCode == 34 || event.keyCode == 45 ||
         event.keyCode == 145 || event.keyCode == 19 || event.keyCode == 91 ||
         event.keyCode == 116 || 
-        (event.ctrlKey == true && event.key == 'a') ||
-        (event.ctrlKey == true && event.keyCode == 'w')))
+        (event.ctrlKey == true && event.keyCode == 'A'.charCodeAt())
+        ))
     {
-        strCheck = false;
-    } else {
-        strCheck = true;
+        titleStrLengthCheck();
     }
+}
 
-    if (strCheck && (str.length >= maxLength)) {
-        alert("제목은 30자 이상 작성하실 수 없습니다.");
-        document.getElementById("create-title").value = str.substring(0, maxLength);
+function titleStrLengthCheck() {
+    var maxLength = 30;
+    var str = document.getElementById("create-title").value;
+
+    if (str.length >= maxLength) {
+        alert("제목은 " + maxLength + "자 이상 작성하실 수 없습니다.");
+        // document.getElementById("create-title").value = str.substring(0, maxLength - 1);
+        document.getElementById("create-title").value = "";
+        return true;
     }
 }
 
@@ -419,22 +472,48 @@ window.addEventListener("mouseup", function() {
 /* 본문 페이지 */
 function getContent(value) {
     movePage('content');
+    // 해당 내용을 가지고 온다.
     var content = JSON.parse(localStorage.getItem("contents"))[value];
+
+    // 목차 부분을 설정한다.
+    console.log(content);
+    console.log(content["html"]);
+    setToc();
 
     var content_head = document.getElementById("content-head");
     content_head.dataset.index = value;
 
     // 본문 페이지의 타이틀, 본문 요소를 가지고 온다.
     var content_title = document.getElementById("content-title");
-    var content_content = document.getElementById("content-content");
+    var content_content = document.getElementById("content-body");
 
     content_title.innerText = content["title"];
     content_content.innerHTML = content["html"];
+    // html을 검사하여 목차를 어떻게 잘 만든다.
+    
+    // 목차를 설정하는 함수
+    function setToc() {
+        // 목차를 추가할 부모 요소
+        var content_toc_nav = document.getElementById("content-toc-nav");
+
+        var toc_li = document.createElement("li");
+        var toc_a = document.createElement("a");
+    }
+
 }
 
 
 /* 검색 기능 */
-document.getElementById("search-button").addEventListener("click", function() {
+document.getElementById("search-text").onkeydown = function() {
+    // 엔터 키를 누를 시
+    if (event.keyCode == 13) {
+        search();
+    }
+}
+
+document.getElementById("search-button").addEventListener("click", search);
+
+function search() {
     var search_text = document.getElementById("search-text");
     var value = search_text.value;
     if (value == "") {
@@ -449,7 +528,7 @@ document.getElementById("search-button").addEventListener("click", function() {
     } else {
         searchContent(value, "title");
     }
-});
+}
 
 // 각 카테고리에 이벤트를 추가한다.
 function loadCategories() {
@@ -536,4 +615,214 @@ function addSearchedContent(content, index) {
     li.appendChild(searched_content_title);
     li.appendChild(searched_content_content);
     searched.appendChild(li);
+}
+
+/* 목차 등을 나타내는 특수 문자들을 제외한 글자들을 반환한다.*/
+function convertContent(content) {
+    var str = "";
+    for(var i = 0; i < content.length; i++) {
+        if (content[i] == "=") continue;
+        else {
+            str += content[i];
+        }
+    }
+
+    return str;
+}
+
+document.getElementById("create-content").onkeyup = function() {
+    // 엔터기 입력 시
+    if (event.keyCode == 13) {
+        this.innerHTML + '\n';
+    }
+    if (this.innerText == "===") {
+        alert("내용의 첫 글자에는 ===를 사용하실 수 없습니다.\n == 또는 글자를 입력해주세요.");
+        this.innerText = "";
+    } else if (this.innerText == "<") {
+        alert("내용의 첫 글자에는 <를 사용하실 수 없습니다.\n역슬래쉬(\\)를 붙이시거나 다른 글자를 입력해주세요.");
+        this.innerText = "";
+    }
+}
+
+/* 작성한 글을 구문 분석을 통해 html을 반환한다. */
+function contentParsing(parsingString) {
+    var toc = {
+        big: "toc-big",
+        small: "toc-small",
+        line: "toc-line"
+    }
+    // 인자로 들어온 문자열을 복사하여 가져온다.
+    var useStr = parsingString;
+    var parsedContent = document.createElement("div");
+    // 입력된 글자를 가져올 변수
+    var inputText = "";
+    // 목차를 제외한 내용의 개수를 나타내는 변수
+    var contentCount = 1;
+
+    // 사용할 문자열이 다 비워질 때 까지 파싱한다.
+    console.log("first:" + useStr);
+    while (useStr != "") {
+        // 처음에는 무조건 ==, <, 그냥 글자로 시작해야 하며
+        // ===로 시작할 경우에는 경고창을 띄운다.
+        if (useStr.substr(0, 2) == "==" ) {
+            // 목차 부분
+            // 내용을 가지고 온다.
+            inputText = useStr.substring(2, useStr.indexOf("==", 2));
+            console.log("목차: " + inputText);
+
+            // 내용을 추가한다.
+            appendContent(inputText, toc.big);
+
+            // 글자를 삭제한다.
+            if (useStr.indexOf("<") == -1) {
+                // 목차 뒤에 내용이 없을 경우 문자열을 비운다.
+                useStr = "";
+            } else {
+                useStr = useStr.slice(useStr.indexOf("<"));
+            }
+            console.log("남은 내용: " + useStr);
+        } else if (useStr[0] == "<") {
+            /* <로 시작하는 경우는 목차를 의미하는 ==를 굵게, 기울이게 하거나
+                <div>로 시작하는 경우이다.
+                이걸 알기 위해 <부터 >까지의 태그 이름을 읽어와 검사한다. */
+
+            // 검사를 위해 태그 이름을 가지고 온다.
+            var tagName = "<" + useStr.slice(1, useStr.indexOf(">")) + ">";
+            var closeTagName = "</" + tagName.substr(1, tagName.length);
+
+            // 태그 이름을 검사한다.
+            if (tagName == "<div>") {
+                // 여러 분기로 나뉜다.
+                // 남은 부분
+                /* <div> 뒤에는 목차를 의미하는 문장이 올 수도 있고
+                중목차를 의미하는 문장이 올 수도 있고
+                평범한 문장이 올 수도 있다.
+                */
+                var strStartIndex = tagName.length;
+                if (useStr.substr(strStartIndex, 3) == "===") {
+                    // 중목차를 의미한다.
+                    // 내용을 가지고 온다.
+                    var tocStartIndex = strStartIndex + 3;
+                    inputText = useStr.substring(tocStartIndex, useStr.indexOf("===", tocStartIndex));
+                    // 내용을 추가한다.
+                    appendContent(inputText, toc.small);
+                    console.log("입력된 중목차 : ", inputText);
+
+                    // inputText이후의 문자열을 불러오기 위한 값이다.
+                    // 목차와는 다르게 +1을 해주어야 제대로 작동한다.
+                    var afterInputText = tagName.length + inputText.length + closeTagName.length + 1;
+
+                    // 글자를 삭제한다.
+                    if (useStr.indexOf("<", afterInputText) == -1) {
+                        // 목차 뒤에 내용이 없을 경우 문자열을 비운다.
+                        useStr = "";
+                    } else {
+                        // 내용이 있을 경우 <를 찾아서 문자열을 자른다.
+                        useStr = useStr.slice(useStr.indexOf("<", afterInputText));
+                    }
+                    console.log("남은 내용 : " + useStr);
+                } else if (useStr.substr(strStartIndex, 2) == "==") {
+                    // 목차를 의미한다.
+                    // 내용을 가지고 온다.
+                    var tocStartIndex = strStartIndex + 2;
+                    // 중목차와는 다르게 -1을 붙여줘야 제대로 작동한다.
+                    inputText = useStr.substring(tocStartIndex, useStr.indexOf("==", tocStartIndex));
+                    // 내용을 추가한다.
+                    appendContent(inputText, toc.big);
+                    console.log("입력된 목차 : ", inputText);
+
+                    // inputText이후의 문자열을 불러오기 위한 인덱스 값이다.
+                    var afterInputText = tagName.length + inputText.length + closeTagName.length;
+
+                    // 글자를 삭제한다.
+                    if (useStr.indexOf("<", afterInputText) == -1) {
+                        // 목차 뒤에 내용이 없을 경우 문자열을 비운다.
+                        useStr = "";
+                    } else {
+                        // 내용이 있을 경우 <를 찾아서 문자열을 자른다.
+                        useStr = useStr.slice(useStr.indexOf("<", afterInputText));
+                    }
+                    console.log("남은 내용 : " + useStr);
+                } else {
+                    // 일반 문장을 의미한다.
+                    // 내용을 가지고 온다.
+                    inputText = useStr.substring(strStartIndex, useStr.indexOf(closeTagName, strStartIndex));
+                    // 내용을 추가한다.
+                    appendContent(inputText, toc.line);
+                    console.log("입력된 내용 : ", inputText);
+                    
+                    // inputText이후의 문자열을 불러오기 위한 값이다.
+                    var afterInputText = tagName.length + inputText.length + closeTagName.length;
+
+                    // 글자를 삭제한다.
+                    if (useStr.indexOf("<", afterInputText) == -1) {
+                        // 목차 뒤에 내용이 없을 경우 문자열을 비운다.
+                        useStr = "";
+                    } else {
+                        // 내용이 있을 경우 <를 찾아서 문자열을 자른다.
+                        useStr = useStr.slice(useStr.indexOf("<", afterInputText));
+                    }
+                    console.log("남은 내용 : " + useStr);
+                }
+            } else {
+                // 이 경우는 목차밖에 없으므로 그에 맞는 기능을 작성한다.
+
+                while (useStr[0] == "<") {
+                    // 목차에 붙은 태그가 없어질 때 까지 계속한다.
+
+                    // 현재 태그 이름과 닫힌 태그 이름을 가지고 온다.
+                    tagName = "<" + useStr.slice(1, useStr.indexOf(">")) + ">";
+                    closeTagName = "</" + tagName.substr(1, tagName.length);
+
+                    // 목차 부분만 가지고 온다.
+                    var tocBig = useStr.substring(tagName.length, useStr.indexOf(closeTagName));
+
+                    // 목차 부분 + 태그가 더해진 목차의 뒷 부분
+                    // ex) ==목차== + <b>==목차==</b>의 뒷부분
+                    // => ==목차== + <div>목차 이후의 문장들</div>...
+                    useStr = tocBig + useStr.slice(tagName.length + tocBig.length + closeTagName.length);
+                    console.log("태그 없앤 후 남은 내용 : " + useStr);
+                }
+            }
+        } else {
+            // 그냥 글자가 입력되었을 경우
+            if (useStr[0] == "\\") {
+                // 역슬래쉬일 경우 역슬래쉬 하나를 지우고 작업한다.
+                // (=, < 등의 특수문자 입력용)
+                useStr = useStr.slice(1);
+            }
+            // 역슬래쉬가 아닌 경우 그대로 작업한다.
+
+            // 입력된 글자를 가지고 온다.
+            if (useStr.indexOf("<") == -1) {
+                // 한 줄만 입력되었을 경우
+                appendContent(useStr, toc.line);
+                useStr = "";
+            } else {
+                // 두 줄 이상 입력되었을 경우
+                inputText = useStr.slice(0, useStr.indexOf("<"));
+                // 입력된 글자를 추가시킨다.
+                appendContent(inputText, toc.line);
+                console.log("입력된 내용 : ", inputText);
+
+                // 입력한 글자 수 만큼 글자를 삭제시킨다.
+                useStr = useStr.slice(useStr.indexOf("<"));
+                console.log("남은 내용 : " + useStr);
+            }
+        }
+    }
+
+    function appendContent(input, type) {
+        var tocElement = document.createElement("div");
+        if (type == toc.line) {
+            tocElement.setAttribute("class", type + contentCount++);
+        } else {
+            tocElement.setAttribute("class", type);
+            tocElement.setAttribute("name", input);
+        }
+        tocElement.innerHTML = input;
+        parsedContent.appendChild(tocElement);
+    }
+
+    return parsedContent.innerHTML;
 }

@@ -5,7 +5,7 @@ var pages = {
     new: "main-new-content",
     create: "main-create-screen",
     search: "main-search-screen",
-    content: "main-content"
+    content: "main-content",
 };
 var pagesData = [pages["new"]];
 var currentPage = pagesData[0];
