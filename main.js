@@ -432,7 +432,7 @@ function getContent(value) {
     content_content.innerHTML = content["html"];
 
     document.getElementById("content-update-button").addEventListener("click", function(){
-        updatePage(content_head.dataset);
+        updatePage(content_head.dataset.index);
     });
 }
 
@@ -547,6 +547,9 @@ function updatePage(value) {
 
     var content = JSON.parse(localStorage.getItem("contents"))[value];
 
+    var update_head = document.getElementById("update-head");
+    update_head.dataset.content = value;
+
     var update_content = document.getElementById("update-content");
     var update_title = document.getElementById("update-title");
 
@@ -556,18 +559,129 @@ function updatePage(value) {
     document.getElementById("cancel").addEventListener("click", function(){
         if(confirm("변경된 내용은 저장되지 않습니다.\n취소하시겠습니까?")){
         prevPage();
-    }
+    } 
 
     });
 
     document.getElementById("content-update").addEventListener("click", function(){
         if(confirm("저장하시겠습니까?")){
-        updateContent();
-    }
+        updateContent(update_head.dataset.content);
+    } 
 
     });
 }
 
-function updateContent() {
+function updateContentData() {
+    /* 내용 저장 */
+    if (localStorage.getItem("contents") != null) {
+        var tempContent = JSON.parse(localStorage.getItem("contents"));
+        tempContent[sectionValue] = saveData;
+        localStorage.removeItem("contents");
+        localStorage.setItem("contents", JSON.stringify(tempContent));
+    } else {
+        var tempContent = {};
+        tempContent[sectionValue] = saveData;
+        localStorage.removeItem("contents");
+        localStorage.setItem("contents", JSON.stringify(tempContent));
+    }
+}
 
+
+// 저장
+function updateContent(value) {
+
+    // 제목, 카테고리, 내용 가져오기
+    var title = document.getElementById("update-title");
+    var category = document.getElementById("select-category");
+    var content = document.getElementById("update-content");
+
+    // 각 요소의 값들만 가져온다.
+    var update_title = title.innerText;
+    var update_category = category.value;
+    var update_content = content.innerText;
+    var update_content_html = content.innerHTML;
+
+    /* 만약 비어있는 경우에 저장을 누르면 이상하게 작동하므로
+    경고 문구를 띄워준다. */
+    if (update_title == "") {
+        // 제목이 비어있을 경우
+        alert("제목이 입력되지 않았습니다.\n제목을 입력해주세요.");
+        return;
+    }
+
+    if (update_content == "") {
+        // 내용이 비어있을 경우
+        alert("내용이 입력되지 않았습니다.\n내용을 입력해주세요.");
+        return;
+    }
+
+    // 제목, 카테고리, 내용을 객체로 저장함
+    saveData["title"] = update_title;
+    saveData["category"] = update_category;
+    saveData["content"] = update_content;
+    saveData["html"] = update_content_html;
+    
+    // 객체 저장
+    if (localStorage.getItem("contents") != null) {
+        var tempContent = JSON.parse(localStorage.getItem("contents"));
+        tempContent[sectionValue] = saveData;
+        localStorage.removeItem("contents");
+        localStorage.setItem("contents", JSON.stringify(tempContent));
+    } else {
+        var tempContent = {};
+        tempContent[sectionValue] = saveData;
+        localStorage.removeItem("contents");
+        localStorage.setItem("contents", JSON.stringify(tempContent));
+    }
+
+    /* new-content에 새로운 포스트 저장 */
+    //최근 글 부모 요소 가져오기
+    var new_contents = document.getElementById("new-contents");
+
+    // 새로운 콘텐츠의 부모 요소 가져오기
+    var new_content = document.createElement("div");
+    new_content.setAttribute("class", "new-content");
+    new_content.setAttribute("onclick", "getContent(" + sectionValue + ")");
+    new_content.dataset.index = sectionValue;
+
+    // 최근 글 타이틀 설정
+    var new_content_title = document.createElement("div");
+    new_content_title.setAttribute("class", "new-content-title");
+    new_content_title.innerText = checkString(saveData["title"], 15, "title");
+    new_content.appendChild(new_content_title);
+
+
+    /* 카테고리 설정 */
+    if (update_category != "none"){
+        addCategory(create_category);
+
+        // 저장된 카테고리 스토리지에 저장
+        localStorage.setItem("categories", JSON.stringify(categories));
+    }
+
+    /* 최근 글 본문 설정 */
+    var new_content_content = document.createElement("p");
+    new_content_content.setAttribute("class", "new-content-content");
+
+    // 첫 번째 글자는 강조를 하고 그 이후 160자 까지만 가져온다.
+    // 글자수 검사
+    new_content_content.innerHTML = "&emsp;" + checkString(saveData["content"]);
+
+    // 최근 글 타이틀과 본문을 최근 글 자식 요소로 추가한다.
+    new_content.appendChild(new_content_content);
+    
+    /* 구분선 추가 */
+    var hr = document.createElement("hr");
+    new_content.appendChild(hr);
+
+    // 최근 글에 새롭게 작성된 글을 추가한다.
+    new_contents.prepend(new_content);
+
+    // 현재까지 저장된 sectionValue 저장
+    localStorage.setItem("sectionValue", ++sectionValue);
+
+    loadCategories();
+    /* 저장이 완료되면 최근 글 페이지로 돌아가고 제목, 카테고리, 내용 부분이 초기화 되며
+    이전 페이지로 돌아가게 된다. */
+    movePage('new');
 }
