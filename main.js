@@ -571,21 +571,6 @@ function updatePage(value) {
     });
 }
 
-function updateContentData() {
-    /* 내용 저장 */
-    if (localStorage.getItem("contents") != null) {
-        var tempContent = JSON.parse(localStorage.getItem("contents"));
-        tempContent[sectionValue] = saveData;
-        localStorage.removeItem("contents");
-        localStorage.setItem("contents", JSON.stringify(tempContent));
-    } else {
-        var tempContent = {};
-        tempContent[sectionValue] = saveData;
-        localStorage.removeItem("contents");
-        localStorage.setItem("contents", JSON.stringify(tempContent));
-    }
-}
-
 
 // 저장
 function updateContent(value) {
@@ -621,16 +606,21 @@ function updateContent(value) {
     saveData["content"] = update_content;
     saveData["html"] = update_content_html;
     
+    var update_head = document.getElementById("update-head");
+    update_head.dataset.content = value;
+
     // 객체 저장
     if (localStorage.getItem("contents") != null) {
         var tempContent = JSON.parse(localStorage.getItem("contents"));
-        tempContent[sectionValue] = saveData;
         localStorage.removeItem("contents");
+        delete tempContent[update_head.dataset.content];
+        tempContent[update_head.dataset.content] = saveData;
         localStorage.setItem("contents", JSON.stringify(tempContent));
     } else {
         var tempContent = {};
-        tempContent[sectionValue] = saveData;
+        tempContent[update_head.dataset.content] = saveData;
         localStorage.removeItem("contents");
+        delete tempContent[update_head.dataset.index]
         localStorage.setItem("contents", JSON.stringify(tempContent));
     }
 
@@ -683,5 +673,5 @@ function updateContent(value) {
     loadCategories();
     /* 저장이 완료되면 최근 글 페이지로 돌아가고 제목, 카테고리, 내용 부분이 초기화 되며
     이전 페이지로 돌아가게 된다. */
-    movePage('new');
+    window.location.reload(true);
 }
