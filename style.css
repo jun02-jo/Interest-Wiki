@@ -15,6 +15,7 @@
 @import url('https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800');
 
 * {
+    scroll-behavior: smooth;
     padding: 0;
     margin: 0;
     box-sizing: content-box;
@@ -566,8 +567,7 @@ aside {
 #main-content {
     display: none;
     background-color: white;
-    width: 100%;
-    height: calc(100vh - 59px);
+    min-height: calc(100vh - 59px);
 }
 
 /* 본문 페이지 머리 부분 */
@@ -613,6 +613,7 @@ aside {
     transition: .3s;
     background-color: white;
     border: 1px solid black;
+    cursor: pointer;
 }
 
 #content-buttons > button:hover {
@@ -643,6 +644,8 @@ aside {
 
 #content-toc {
     font-family: 'Nanum Gothic', sans-serif;
+    font-size: 14pt;
+    font-weight: bold;
 }
 
 #content-toc-nav {
@@ -658,11 +661,18 @@ aside {
     margin-left: 0.5em;
 }
 
+#content-toc-nav .toc-big a,
+#content-toc-nav .toc-small a{
+    font-size: 16pt;
+    font-weight: bold;
+    color: #000;
+}
+
 
 /* 본문 페이지 본문 부분 */
 #content-body {
     position: relative;
-    padding: 1em 1.5em;
+    padding: 1em 2em 1em 1.5em;
     border-top: 1px solid black;
     width: 93%;
     left: 50%;
@@ -683,4 +693,50 @@ aside {
 #content-content {
     width: 1211px;
     padding-right: 1.5em;
+}
+
+#content-content {
+    font-size: 13pt;
+}
+
+#content-body .toc-big,
+#content-body .toc-small {
+    display: block;
+    font-size: 16pt;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 0.5em;
+    padding: 1em 0.5em 0.5em 0.5em;
+    border-bottom: 2px dashed #777777;
+}
+
+.toc-big-number, .toc-small-number {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #0a0aaa;
+}
+
+.toc-line {
+    margin-left: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+#content-up-button {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    font-size: 40px;
+    margin-right: 45px;
+    margin-bottom: 20px;
+    transition: .5s;
+}
+
+#content-up-button i {
+    color: #0f0f0f;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+#content-up-button:hover {
+    transform: scale(1.2);
 }

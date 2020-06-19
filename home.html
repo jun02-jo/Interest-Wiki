@@ -162,7 +162,7 @@
                                 </button>
                                 <!-- ... -->
                             </div>
-                            <div id="create-content" contenteditable="true"></div>
+                            <div id="create-content" contenteditable="true" onpaste="return false;"></div>
                         </div>
                         <div id="create-foot">
                             <button id="content-save">저장</button>
@@ -250,6 +250,7 @@
                         <!-- 미리보기 부분입니다. -->
                     </div>
                     <div id="content-body">
+                        <div id="content-content"></div>
                         <!-- 미리보기 부분입니다. -->
                         <!-- <p id="content-content"></p> -->
                         <!-- Lorem ipsum dolor, sit amet consectetur adipisicing elit.
@@ -257,6 +258,11 @@
                         nobis incidunt nostrum placeat natus aperiam omnis mollitia modi
                         quod soluta optio. Nisi. -->
                         <!-- 미리보기 부분입니다. -->
+                    </div>
+                    <div id="content-up-button">
+                        <a href="#container">
+                            <i class="fa fa-arrow-circle-up"></i>
+                        </a>
                     </div>
                 </arcitle>
             </section>

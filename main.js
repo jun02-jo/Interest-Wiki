@@ -452,6 +452,17 @@ document.getElementById("create-title").onkeydown = function() {
     }
 }
 
+// 본문 작성 시 붙여넣기가 불가능 하도록 만든다.
+// (붙여넣기 할 시 저장할 때 문제가 발생)
+var dontPaste = document.getElementById("create-content");
+dontPaste.onpaste = function() { return false; }
+dontPaste.onkeydown = function() {
+    if (event.ctrlKey == true && event.keyCode == 'V'.charCodeAt()) {
+        alert("붙여넣기를 하실 수 없습니다.");
+        return;
+    }
+}
+
 function titleStrLengthCheck() {
     var maxLength = 30;
     var str = document.getElementById("create-title").value;
@@ -515,15 +526,29 @@ function getContent(value) {
                     toc_li.setAttribute("class", value_class + " " + ++tocBig);
                     tocSmall = 0;
 
-                    toc_a.setAttribute("href", "#" + value_name);
-                    toc_a.setAttribute("name", "toc-" + value_name);
-                    toc_a.innerText = tocBig + ". " + value_content;
-                } else if (value_class == toc.small){
-                    toc_li.setAttribute("class", value_class + " " + ++tocSmall);
+
+                    var span = document.createElement("span");
+                    span.setAttribute("class", value_class + "-number");
+                    span.innerText = tocBig + ".";
 
                     toc_a.setAttribute("href", "#" + value_name);
                     toc_a.setAttribute("name", "toc-" + value_name);
-                    toc_a.innerText = tocBig + "." + tocSmall + " " + value_content;
+
+                    toc_a.appendChild(span);
+                    toc_a.innerHTML += " " + value_content;
+                } else if (value_class == toc.small){
+                    toc_li.setAttribute("class", value_class + " " + ++tocSmall);
+
+                    var span = document.createElement("span");
+                    span.setAttribute("class", value_class + "-number");
+                    span.innerText = tocBig + "." + tocSmall;
+
+                    toc_a.setAttribute("href", "#" + value_name);
+                    toc_a.setAttribute("name", "toc-" + value_name);
+
+                    
+                    toc_a.appendChild(span);
+                    toc_a.innerHTML += " " + value_content;
                 }
 
                 toc_li.appendChild(toc_a);
