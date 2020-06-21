@@ -137,6 +137,17 @@ function setCategories() {
 
 /* 생성(글 작성) 부분 */
 
+// 글 작성 시 새로고침, 탭 닫기 방지
+window.onbeforeunload = function() {
+    if (currentPage == pages["create"]) {
+        if (confirm("작성하던 글이 저장되지 않습니다.\n정말 탭을 닫으시겠습니까?")) {
+            event.returnValue = true;
+        } else {
+            event.returnValue = false;
+        }
+    }
+}
+
 // 글 작성 페이지 이동을 위한 부분
 document.getElementById("create-button").addEventListener("click", function() {
     movePage('create');
