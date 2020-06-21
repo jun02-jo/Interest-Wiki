@@ -2,6 +2,7 @@ var saveData = {};
 // var contents = {};
 var categories = [];
 var sectionValue = 0;
+var selected = undefined;
 
 
 window.onload = initData();
@@ -143,7 +144,7 @@ document.getElementById("create-button").addEventListener("click", function() {
 })
 
 // 글 작성 버튼(굵게, 기울이기 등)을 눌렀을 때
-// 목차 혹은 중목차일 경우 굵게, 기울이기 등을 막기 위한 함수
+// 목차 혹은 소목차일 경우 굵게, 기울이기 등을 막기 위한 함수
 function loadCommandButtonFunc() {
     var commands = document.getElementsByClassName("create-command");
     [].forEach.call(commands, function(command) {
@@ -153,19 +154,33 @@ function loadCommandButtonFunc() {
             // italic일 경우
             //  this.classList: ["create-command", "italic", value: "create-command italic"]
             var buttonType = this.classList[1];
-            console.log(buttonType);
-            var selectedText = window.getSelection().getRangeAt(0).toString();
-
-            if (buttonType == "bold" || buttonType == "italic")  {
+            console.log(window.getSelection());
+            if (window.getSelection().anchorNode) {
+                selected = window.getSelection().getRangeAt(0);
+                var selectedText = selected.toString();
+                console.log(selectedText);
+            }
+        
+            if (buttonType == "bold" || buttonType == "italic" || 
+            buttonType == "strikeThrough" || buttonType == "underline")  {
+                // 목차나 소목차가 아닐 경우 글자 스타일을 변경해준다.
                 if (selectedText.indexOf("===") != -1 || selectedText.indexOf("==") != -1) {
-                    alert("목차나 중목차는 수정하실 수 없습니다.");
+                    alert("목차나 소목차는 수정하실 수 없습니다.");
                     return;
                 } else {
                     document.execCommand(buttonType);
                 }
-            } else {
-                // document.execCommand(buttonType);
+            } else if (buttonType == "link") {
+                console.log("링크 붙임");
+                // 선택한 부분 앞 뒤에 [[]]를 붙인다.
+                var node = document.createElement("span");
+                node.innerText = "[[" + selectedText + "]]";
+                
+                selected.deleteContents();
+                selected.insertNode(node);
             }
+
+            document.getElementById("create-content").focus();
         })
     })
 }
@@ -307,7 +322,6 @@ function saveContent() {
     saveData["category"] = create_category;
     saveData["content"] = convertContent(create_content);
     saveData["html"] = contentParsing(create_content_html);
-    console.log(saveData["html"]);
     
     // 객체 저장
     saveContentData()
@@ -434,8 +448,7 @@ function saveContentData() {
 // 글 작성 시 제목의 글자 수가 30자를 넘어가지 않도록 한다.
 document.getElementById("create-title").onkeydown = function() {
     // 입력받을 최대 글자 수(30자)를 넘어갈 경우 경고창을 내보낸다
-    // console.log(event);
-    // console.log(event.keyCode);
+    
     // 특정 키는 글자 수를 검사하는데 포함시키지 않는다.
     if (!(event.keyCode == 8 || event.keyCode == 46 || event.keyCode == 16 ||
         event.keyCode == 17 || event.keyCode == 18 || event.keyCode == 20 ||
@@ -444,22 +457,11 @@ document.getElementById("create-title").onkeydown = function() {
         event.keyCode == 40 || event.keyCode == 36 || event.keyCode == 35 ||
         event.keyCode == 33 || event.keyCode == 34 || event.keyCode == 45 ||
         event.keyCode == 145 || event.keyCode == 19 || event.keyCode == 91 ||
-        event.keyCode == 116 || 
+        event.keyCode == 116 || event.keyCode == 123 ||
         (event.ctrlKey == true && event.keyCode == 'A'.charCodeAt())
         ))
     {
         titleStrLengthCheck();
-    }
-}
-
-// 본문 작성 시 붙여넣기가 불가능 하도록 만든다.
-// (붙여넣기 할 시 저장할 때 문제가 발생)
-var dontPaste = document.getElementById("create-content");
-dontPaste.onpaste = function() { return false; }
-dontPaste.onkeydown = function() {
-    if (event.ctrlKey == true && event.keyCode == 'V'.charCodeAt()) {
-        alert("붙여넣기를 하실 수 없습니다.");
-        return;
     }
 }
 
@@ -491,11 +493,9 @@ function getContent(value) {
     movePage('content');
     // 해당 내용을 가지고 온다.
     var content = JSON.parse(localStorage.getItem("contents"))[value];
-    console.log(content["html"]);
 
     // 목차를 설정하는 함수
     function setToc() {
-        console.log("목차 설정");
         var parent = document.getElementById("content-toc-nav");
         if (parent != null) {
             parent.remove();
@@ -517,7 +517,7 @@ function getContent(value) {
                 var value_name = tocContent[i][1];
                 var value_content = tocContent[i][2];
 
-                // 목차나 중목차일 경우에만 목차에 추가한다.
+                // 목차나 소목차일 경우에만 목차에 추가한다.
                 // li 요소 추가
                 var toc_li = document.createElement("li");
                 var toc_a = document.createElement("a");
@@ -525,7 +525,6 @@ function getContent(value) {
                 if (value_class == toc.big) {
                     toc_li.setAttribute("class", value_class + " " + ++tocBig);
                     tocSmall = 0;
-
 
                     var span = document.createElement("span");
                     span.setAttribute("class", value_class + "-number");
@@ -545,7 +544,6 @@ function getContent(value) {
 
                     toc_a.setAttribute("href", "#" + value_name);
                     toc_a.setAttribute("name", "toc-" + value_name);
-
                     
                     toc_a.appendChild(span);
                     toc_a.innerHTML += " " + value_content;
@@ -556,7 +554,6 @@ function getContent(value) {
             }
         }
         content_nav.appendChild(content_toc_nav);
-        console.log(content_toc_nav);
     }
     setToc();
 
@@ -591,10 +588,7 @@ function getContent(value) {
             var value_name = contentList[i][1];
             var value_content = contentList[i][2];
 
-            console.log(contentList[i]);
             if (value_class == toc.line) {
-                console.log(value_class);
-                console.log(value_content);
                 var content_div = document.createElement("div");
                 content_div.setAttribute("class", value_class + " " + contentLine++);
                 content_div.innerHTML = value_content;
@@ -603,7 +597,7 @@ function getContent(value) {
             } else if (value_class == toc.big) {
                 var content_a = document.createElement("a");
                 content_a.setAttribute("class", value_class + " " + ++tocBig);
-                content_a.setAttribute("href", "#" + "content-nav");
+                content_a.setAttribute("href", "#" + "container");
                 content_a.setAttribute("id", value_name);
                 //ex) <div class="toc-big 1"></div>
 
@@ -625,7 +619,7 @@ function getContent(value) {
             } else if (value_class == toc.small) {
                 var content_a = document.createElement("a");
                 content_a.setAttribute("class", value_class + " " + ++tocSmall);
-                content_a.setAttribute("href", "#" + "content-nav");
+                content_a.setAttribute("href", "#" + "container");
                 content_a.setAttribute("id", value_name);
                 //ex) <div class="toc-small 1"></div>
 
@@ -638,7 +632,6 @@ function getContent(value) {
 
                 content_a.appendChild(span);
                 content_a.innerHTML += " " + value_content;
-                console.log(content_a.innerHTML);
                 /*ex) <div class="toc-small 1">
                     <span class="toc-small-number">1.1</span> 내용
                 </div> */
@@ -647,7 +640,6 @@ function getContent(value) {
             }
         }
         content_body.appendChild(content_content);
-        console.log(content_body);
     }
 }
 
@@ -767,23 +759,62 @@ function addSearchedContent(content, index) {
 }
 
 /* 목차 등을 나타내는 특수 문자들을 제외한 글자들을 반환한다.*/
-function convertContent(content) {
+function convertContent(convertingStr="") {
+    console.log(convertingStr);
+    console.log("변환 시작");
+    // 목차, 소목차를 나타내는 =를 없앤다.
+    var convertStr = convertingStr.replace(/=/gi, "");
     var str = "";
-    for(var i = 0; i < content.length; i++) {
-        if (content[i] == "=") continue;
-        else {
-            str += content[i];
+    var linkStr = "";
+
+    // 링크 관련된 부분 중 불필요한 부분을 없앤다.
+    // [[, ]], |, 외부 링크 등
+    // convertStr이 빌 때 까지 반복
+    while (!(convertStr == "")) {
+        try {
+            if (convertStr.indexOf("[[") == -1) {
+                // 만약 링크가 없다면
+                throw new Error("변환할 부분이 없습니다.");
+            } else {
+                // 일단 [[ 전까지의 문자열을 저장한다.
+                str += convertStr.slice(0, convertStr.indexOf("[["));
+
+                // [[의 뒷부분을 가지고 온다.
+                convertStr = convertStr.slice(convertStr.indexOf("[[") + 2);
+
+                // 링크에 관련된 문자열을 가지고 온다.
+                linkStr = convertStr.slice(0, convertStr.indexOf("]]"));
+                if (linkStr.indexOf("|") == -1) {
+                    // 외부 링크가 없다면 그냥 저장한다.
+                    str += linkStr;
+                } else {
+                    // 외부 링크가 있다면 글자 부분만 가지고 온다.
+                    var showStr = linkStr.slice(linkStr.indexOf("|") + 1);
+                    str += showStr;
+                }
+
+                // 남은 부분을 저장한다.
+                convertStr = convertStr.slice(convertStr.indexOf("]]") + 2);
+            }
+        } catch (e) {
+            str += convertStr;
+            convertStr = "";
         }
     }
 
+    console.log("변환 후");
+    console.log(str);
+    console.log(typeof str);
     return str;
 }
 
-document.getElementById("create-content").onkeyup = function() {
-    // 엔터기 입력 시
-    if (event.keyCode == 13) {
-        this.innerHTML + '\n';
+document.getElementById("create-content").onkeydown = function() {
+    // 탭 키를 눌렀을 때
+    if (event.keyCode == 9) {
+        document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
+        event.preventDefault();
     }
+
     if (this.innerText == "===") {
         alert("내용의 첫 글자에는 ===를 사용하실 수 없습니다.\n == 또는 글자를 입력해주세요.");
         this.innerText = "";
@@ -793,215 +824,216 @@ document.getElementById("create-content").onkeyup = function() {
     }
 }
 
-/* 작성한 글을 구문 분석을 통해 html을 반환한다. */
-function contentParsing(parsingString) {
+/* 작성한 글을 구문 분석(파싱)을 통해 html을 반환한다. */
+function contentParsing(parsingString="") {
+    console.log("들어온 문자열: ", parsingString);
+    // 인자로 들어온 문자열을 복사한다.
+    var parseStr = parsingString;
+
+    // 나누어진 문자열을 담을 리스트 변수
+    var strs = [];
+    // strs의 인덱스를 나타내는 변수
+    var index = 0;
+
+    // indexOf로 찾은 인덱스 번호를 나타내는 변수
+    var findIndex = 0;
+
+    // [elementClass, elementname, elementContent]
+    // 반환할 변수
+    var parsedContent = [];
+
+    // 목차, 소목차, 그냥 문장을 나타내는 객체
     var toc = {
         big: "toc-big",
         small: "toc-small",
         line: "toc-line"
     };
-    // 인자로 들어온 문자열을 복사하여 가져온다.
-    var useStr = parsingString;
-    // var parsedContent = document.createElement("div");
-    var parsedContent = [];
-    // 입력된 글자를 가져올 변수
-    var inputText = "";
 
-    // 리스트를 추가하는 함수
-    function appendContent(input, type) {
-        var elementClass = "";
-        var elementName = "";
-        var elementContent = input;
-        var element = [];
-        
-        if (type == toc.line) {
-            elementClass = type;
-            element.push(elementClass, elementName, elementContent);
-        } else {
-            elementClass = type;
-            elementName = input;
-            element.push(elementClass, elementName, elementContent);
+    console.log("start while");
+    // 맨 먼저 각 문장 별로 나누어 리스트에 담는다.
+    while (parseStr != "") {
+        console.log(strs);
+        try {
+            if (parseStr.substr(0, 5) === "<div>") {
+                console.log("<div> 시작");
+                // 붙여넣기를 했을 경우 맨 처음은 <div>로 시작한다.
+                // 첫 번째줄이 스타일을 변형한 경우에는 무시한다.
+                // 즉, <div>로만 나눈다.
+
+                // <div>를 제외한 시작 인덱스
+                var startIndex = 5;
+                // 끝 부분을 찾는다.
+                findIndex = parseStr.indexOf("</div>", startIndex);
+
+                strs[index] = parseStr.substring(startIndex, findIndex);
+
+                // 시작 인덱스 이후로 나타나는 <div>를 찾는다.
+                if (parseStr.indexOf("<div>", startIndex) == -1) {
+                    throw new Error("더이상 찾을 문자열이 없습니다.");
+                }
+                findIndex = parseStr.indexOf("<div>", startIndex);
+                parseStr = parseStr.slice(findIndex);
+                index++;
+            } else {
+                console.log("시작");
+                // 붙여넣기를 하지 않을 경우 처음은 <div>로 시작하지 않는다.
+                // 단, 스타일을 변형했을 경우에는 <~>로 시작한다.
+
+                // <div>를 찾는다.
+                if (parseStr.indexOf("<div>") == -1) {
+                    strs[index] = parseStr;
+                    throw new Error("더이상 찾을 문자열이 없습니다.");
+                }
+                findIndex = parseStr.indexOf("<div>");
+
+                // 리스트 변수안에 문자열을 추가한다.
+                strs[index] = parseStr.substring(0, findIndex);
+
+                // 찾은 문자열을 제외하고 남은 문자열을 저장한다.
+                parseStr = parseStr.slice(findIndex);
+                index++;
+            }
+        } catch (e) {
+            console.log(e);
+            parseStr = "";
         }
+            
+    }
+    console.log("end while");
 
-        parsedContent.push(element);
-
-
-        // var tocElement = document.createElement("div");
-        // if (type == toc.line) {
-        //     tocElement.setAttribute("class", type + contentCount++);
-        // } else {
-        //     tocElement.setAttribute("class", type);
-        //     tocElement.setAttribute("name", input);
-        // }
-        // tocElement.innerHTML = input;
-        // parsedContent.appendChild(tocElement);
+    for (var i = 0; i <= index; i++) {
+        // strParsing의 반환값은 리스트이다.
+        parsedContent[i] = extractFromStr(strs[i]);
     }
 
-    // function appendContent(input, type) {
-    //     var tocElement = document.createElement("div");
-    //     if (type == toc.line) {
-    //         tocElement.setAttribute("class", type + contentCount++);
-    //     } else {
-    //         tocElement.setAttribute("class", type);
-    //         tocElement.setAttribute("name", input);
-    //     }
-    //     tocElement.innerHTML = input;
-    //     parsedContent.appendChild(tocElement);
-    // }
-
-    // 사용할 문자열이 다 비워질 때 까지 파싱한다.
-    console.log("first:" + useStr);
-    while (useStr != "") {
-        // 처음에는 무조건 ==, <, 그냥 글자로 시작해야 하며
-        // ===로 시작할 경우에는 경고창을 띄운다.
-        if (useStr.substr(0, 2) == "==" ) {
-            // 목차 부분
-            // 내용을 가지고 온다.
-            inputText = useStr.substring(2, useStr.indexOf("==", 2));
-            console.log("목차: " + inputText);
-
-            // 내용을 추가한다.
-            appendContent(inputText, toc.big);
-
-            // 글자를 삭제한다.
-            if (useStr.indexOf("<") == -1) {
-                // 목차 뒤에 내용이 없을 경우 문자열을 비운다.
-                useStr = "";
-            } else {
-                useStr = useStr.slice(useStr.indexOf("<"));
-            }
-            console.log("남은 내용: " + useStr);
-        } else if (useStr[0] == "<") {
-            /* <로 시작하는 경우는 목차를 의미하는 ==를 굵게, 기울이게 하거나
-                <div>로 시작하는 경우이다.
-                이걸 알기 위해 <부터 >까지의 태그 이름을 읽어와 검사한다. */
-
-            // 검사를 위해 태그 이름을 가지고 온다.
-            var tagName = "<" + useStr.slice(1, useStr.indexOf(">")) + ">";
-            var closeTagName = "</" + tagName.substr(1, tagName.length);
-
-            // 태그 이름을 검사한다.
-            if (tagName == "<div>") {
-                // 여러 분기로 나뉜다.
-                // 남은 부분
-                /* <div> 뒤에는 목차를 의미하는 문장이 올 수도 있고
-                중목차를 의미하는 문장이 올 수도 있고
-                평범한 문장이 올 수도 있다.
-                */
-                var strStartIndex = tagName.length;
-                if (useStr.substr(strStartIndex, 3) == "===") {
-                    // 중목차를 의미한다.
-                    // 내용을 가지고 온다.
-                    var tocStartIndex = strStartIndex + 3;
-                    inputText = useStr.substring(tocStartIndex, useStr.indexOf("===", tocStartIndex));
-                    // 내용을 추가한다.
-                    appendContent(inputText, toc.small);
-                    console.log("입력된 중목차 : ", inputText);
-
-                    // inputText이후의 문자열을 불러오기 위한 값이다.
-                    // 목차와는 다르게 +1을 해주어야 제대로 작동한다.
-                    var afterInputText = tagName.length + inputText.length + closeTagName.length + 1;
-
-                    // 글자를 삭제한다.
-                    if (useStr.indexOf("<", afterInputText) == -1) {
-                        // 목차 뒤에 내용이 없을 경우 문자열을 비운다.
-                        useStr = "";
-                    } else {
-                        // 내용이 있을 경우 <를 찾아서 문자열을 자른다.
-                        useStr = useStr.slice(useStr.indexOf("<", afterInputText));
-                    }
-                    console.log("남은 내용 : " + useStr);
-                } else if (useStr.substr(strStartIndex, 2) == "==") {
-                    // 목차를 의미한다.
-                    // 내용을 가지고 온다.
-                    var tocStartIndex = strStartIndex + 2;
-                    // 중목차와는 다르게 -1을 붙여줘야 제대로 작동한다.
-                    inputText = useStr.substring(tocStartIndex, useStr.indexOf("==", tocStartIndex));
-                    // 내용을 추가한다.
-                    appendContent(inputText, toc.big);
-                    console.log("입력된 목차 : ", inputText);
-
-                    // inputText이후의 문자열을 불러오기 위한 인덱스 값이다.
-                    var afterInputText = tagName.length + inputText.length + closeTagName.length;
-
-                    // 글자를 삭제한다.
-                    if (useStr.indexOf("<", afterInputText) == -1) {
-                        // 목차 뒤에 내용이 없을 경우 문자열을 비운다.
-                        useStr = "";
-                    } else {
-                        // 내용이 있을 경우 <를 찾아서 문자열을 자른다.
-                        useStr = useStr.slice(useStr.indexOf("<", afterInputText));
-                    }
-                    console.log("남은 내용 : " + useStr);
-                } else {
-                    // 일반 문장을 의미한다.
-                    // 내용을 가지고 온다.
-                    inputText = useStr.substring(strStartIndex, useStr.indexOf(closeTagName, strStartIndex));
-                    // 내용을 추가한다.
-                    appendContent(inputText, toc.line);
-                    console.log("입력된 내용 : ", inputText);
-                    
-                    // inputText이후의 문자열을 불러오기 위한 값이다.
-                    var afterInputText = tagName.length + inputText.length + closeTagName.length;
-
-                    // 글자를 삭제한다.
-                    if (useStr.indexOf("<", afterInputText) == -1) {
-                        // 목차 뒤에 내용이 없을 경우 문자열을 비운다.
-                        useStr = "";
-                    } else {
-                        // 내용이 있을 경우 <를 찾아서 문자열을 자른다.
-                        useStr = useStr.slice(useStr.indexOf("<", afterInputText));
-                    }
-                    console.log("남은 내용 : " + useStr);
-                }
-            } else {
-                // 이 경우는 목차밖에 없으므로 그에 맞는 기능을 작성한다.
-
-                while (useStr[0] == "<") {
-                    // 목차에 붙은 태그가 없어질 때 까지 계속한다.
-
-                    // 현재 태그 이름과 닫힌 태그 이름을 가지고 온다.
-                    tagName = "<" + useStr.slice(1, useStr.indexOf(">")) + ">";
-                    closeTagName = "</" + tagName.substr(1, tagName.length);
-
-                    // 목차 부분만 가지고 온다.
-                    var tocBig = useStr.substring(tagName.length, useStr.indexOf(closeTagName));
-
-                    // 목차 부분 + 태그가 더해진 목차의 뒷 부분
-                    // ex) ==목차== + <b>==목차==</b>의 뒷부분
-                    // => ==목차== + <div>목차 이후의 문장들</div>...
-                    useStr = tocBig + useStr.slice(tagName.length + tocBig.length + closeTagName.length);
-                    console.log("태그 없앤 후 남은 내용 : " + useStr);
-                }
-            }
-        } else {
-            // 그냥 글자가 입력되었을 경우
-            if (useStr[0] == "\\") {
-                // 역슬래쉬일 경우 역슬래쉬 하나를 지우고 작업한다.
-                // (=, < 등의 특수문자 입력용)
-                useStr = useStr.slice(1);
-            }
-            // 역슬래쉬가 아닌 경우 그대로 작업한다.
-
-            // 입력된 글자를 가지고 온다.
-            if (useStr.indexOf("<") == -1) {
-                // 한 줄만 입력되었을 경우
-                appendContent(useStr, toc.line);
-                useStr = "";
-            } else {
-                // 두 줄 이상 입력되었을 경우
-                inputText = useStr.slice(0, useStr.indexOf("<"));
-                // 입력된 글자를 추가시킨다.
-                appendContent(inputText, toc.line);
-                console.log("입력된 내용 : ", inputText);
-
-                // 입력한 글자 수 만큼 글자를 삭제시킨다.
-                useStr = useStr.slice(useStr.indexOf("<"));
-                console.log("남은 내용 : " + useStr);
-            }
-        }
-    }
-
+    // 반환
+    console.log(parsedContent);
     return JSON.stringify(parsedContent);
-    // return parsedContent.innerHTML;
+
+    // 문자열에서 필요한 정보만 추출한다.
+    function extractFromStr(eStr="") {
+        console.log("extractFromStr");
+        console.log(eStr);
+        var element = [];
+    
+        strParsing(eStr);
+
+        // [[class, name, content]]의 형태
+        // extractFromStr의 return이다.
+        return element;
+
+
+        // 문자열을 분석한다.
+        function strParsing(str="") {
+            console.log("strParsing");
+            str.replace(/^ /gi, "");
+            if (str[0] == "*") {
+                console.log("리스트");
+                str = str.replace("*", "<span class='content_list'>●</span>");
+                console.log(str);
+            }
+
+            var elementClass = "";
+            var elementName = "";
+            var elementContent = ""; // html형태로 저장된다.
+            var inputText = "";
+    
+            if (str.substr(0, 3) == "===") {
+                // 소목차
+                inputText = str.substring(3, str.indexOf("=", 3));
+
+                elementClass = toc.small;
+                elementName = inputText;
+                elementContent = inputText;
+            } else if (str.substr(0, 2) == "==") {
+                // 목차
+                inputText = str.substring(2, str.indexOf("=", 2));
+
+                elementClass = toc.big;
+                elementName = inputText;
+                elementContent = inputText;
+            } else {
+                elementClass = toc.line;
+                elementName = "";
+
+                // 문장 안에 링크가 있나 없나 검사해야 함
+                if (str.indexOf("[[") == -1) {
+                    // 링크가 없으면 바로 저장
+                    elementContent = str;
+                } else {
+                    var linkStr = "";
+
+                    // 만약 링크가 있다면 여러개가 있을 수 있으므로
+                    // 반복해서 검사한다.
+                    while (str != "") {
+                        // str이 빌 때 까지 검사한다.
+                        try {
+                            if (str.indexOf("[[") == -1) {
+                                // 만약 링크가 더 없으면 남은 문자열을 다 더한다.
+                                elementContent += str;
+                                throw new Error("더이상 분석할 문자열이 없습니다.");
+                            } else {
+                                console.log("분석 중..");
+                                // [[ 앞에 있는 문자열을 먼저 담는다.
+                                // TODO 에러 발생
+                                elementContent += str.substring(0, str.indexOf("[["));
+
+                                // [[ 앞에 있는 문자열을 잘라낸다.
+                                // [[ 뒤에 있는 문자열을 가져옴
+                                str = str.slice(str.indexOf("[["));
+
+                                // 링크에 관련된 문자열을 가지고 온다.
+                                linkStr = str.substring(2, str.indexOf("]]"));
+                                console.log("linkStr: " + linkStr);
+
+                                // 링크가 외부 링크인지(|가 있는지)
+                                // 내부 링크인지 (|가 없는지) 검사한다.
+                                if (linkStr.indexOf("|") != -1) {
+                                    // 외부 링크 (|가 있다)
+                                    console.log("외부 링크 거는 중..");
+                                    var link = linkStr.slice(0, linkStr.indexOf("|")); // 링크 부분
+                                    var showStr = linkStr.slice(linkStr.indexOf("|") + 1); // 글자 부분
+                                    
+                                    // <a class='content=link' href='link'>showStr</a>
+                                    elementContent += "<a class='content_link' href='" + link + "' target='_blank'>" + showStr + "</a>";
+
+                                } else {
+                                    console.log("내부 링크 거는 중..");
+                                    // 내부 링크 (|가 없다)
+                                    // 입력한 값과 일치하는 제목이 있을 경우
+                                    // 해당 글로 링크를 건다. (getContent)
+                                    var findContent = function() {
+                                        var contents = JSON.parse(localStorage.getItem("contents"));
+                                        for (var i = 0; i < sectionValue; i++) {
+                                            if (contents[i] != null) {
+                                                if (contents[i]["title"] === linkStr) {
+                                                    // 만약 타이틀이 일치하다면 해당 글로 링크를 건다.
+                                                    // ex) <span class='content_link' onclick='getContent(0)'>ABC</span>
+                                                    elementContent += "<span class='content_link' onclick='getContent(" + i + ")'>" + linkStr + "</span>";
+                                                    return true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (!findContent()) {
+                                        // 만약 해당되는 글이 없을 경우
+                                        elementContent += "<span class='havent_content_link'>" + linkStr + "</span>";
+                                    }
+                                } // if (linkStr.indexOf("|"))
+
+                                // 다시 검사하기 위해 ]] 뒤에 있는 문자열을 가지고 온다.
+                                str = str.slice(str.indexOf("]]") + 2);
+                            } //if (str.indexOf("[[") == -1)
+                            console.log(elementContent);
+                        } catch (e) {
+                            console.log(e);
+                            str = "";
+                        }
+                    } // while(str != "")
+                } //if (str.indexOf("[[") == -1)
+            }
+
+            element.push(elementClass, elementName, elementContent);
+        }
+    }
 }

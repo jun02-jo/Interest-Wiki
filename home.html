@@ -154,15 +154,26 @@
                         </div>
                         <div id="create-body">
                             <div id="create-commands">
+                                <!-- 취소선, 밑 줄, 링크, 목차, 소목차... -->
                                 <button class="create-command bold">
                                     <b>굵게</b>
                                 </button>
                                 <button class="create-command italic">
                                     <i>기울이기</i>
                                 </button>
+                                <button class="create-command strikeThrough">
+                                    <del>취소선</del>
+                                </button>
+                                <button class="create-command underline">
+                                    <ins>밑줄</ins>
+                                </button>
+                                <button class="create-command link">
+                                    <i class="fa fa-paperclip fa-flip-horizontal"></i>
+                                    링크
+                                </button>
                                 <!-- ... -->
                             </div>
-                            <div id="create-content" contenteditable="true" onpaste="return false;"></div>
+                            <div id="create-content" contenteditable="true"></div>
                         </div>
                         <div id="create-foot">
                             <button id="content-save">저장</button>
@@ -203,6 +214,11 @@
                         </li> -->
                     </ul>
                     <!-- 미리보기 부분입니다. -->
+                    <div id="content-up-button">
+                        <a href="#container">
+                            <i class="fa fa-arrow-circle-up"></i>
+                        </a>
+                    </div>
                 </article>
 
                 <arcitle id="main-content">
