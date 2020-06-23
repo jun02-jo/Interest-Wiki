@@ -314,6 +314,20 @@ function saveContent() {
         return;
     }
 
+    // 저장된 글 중 같은 제목이 있는지 검사한다.
+    var titles = JSON.parse(localStorage.getItem("contents"));
+    for (var i in titles) {
+        console.log(titles[i]["title"]);
+        // 만약 같은 제목이 있다면
+        if (titles[i]["title"] == title.value) {
+            // 경고창을 띄우고 제목 입력창을 비운다.
+            alert("같은 제목의 글이 있습니다.");
+            title.value = "";
+            title.focus();
+            return;
+        }
+    }
+
     /* 만약 비어있는 경우에 저장을 누르면 이상하게 작동하므로
     경고 문구를 띄워준다. */
     if (create_title == "") {
