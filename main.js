@@ -447,6 +447,7 @@ function createCategory(parent, categoryName) {
 
     // 검색 기능을 만들면 수정 필요
     var span = document.createElement("span");
+    span.setAttribute("class", "search-category");
     span.innerText = categoryName;
 
     category_delete.appendChild(category_delete_icon);
@@ -698,10 +699,10 @@ function search() {
 
 // 각 카테고리에 이벤트를 추가한다.
 function loadCategories() {
-    var search_category = document.getElementsByClassName("category-content");
+    var search_category = document.getElementsByClassName("search-category");
     [].forEach.call(search_category, function(category) {
         category.addEventListener("click", function() {
-            searchContent(category.dataset.category, "category");
+            searchContent(this.parentNode.dataset.category, "category");
         })
     })
 }
