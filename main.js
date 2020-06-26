@@ -1,6 +1,6 @@
 var saveData = {};
 // var contents = {};
-var categories = [];
+var categoryList = [];
 var sectionValue = 0;
 var selected = undefined;
 
@@ -24,10 +24,11 @@ function initData() {
 
 /* 카테고리를 가져오는 함수 */
 function getCategories() {
-    categories = JSON.parse(localStorage.getItem("categories"));
-    var categoryList = JSON.parse(JSON.stringify(categories)); // Array
+    var categories = [];
+    categoryList = categories = JSON.parse(localStorage.getItem("categories"));
+    var category_list = JSON.parse(JSON.stringify(categories)); // Array
     // var categoryList = JSON.parse(localStorage.getItem("categories"));
-    var category = categoryList.shift();
+    var category = category_list.shift();
 
     while (category != undefined) {
         // aside에 있는 show-categories 부분에 추가한다.
@@ -46,6 +47,7 @@ function getCategories() {
         category_delete_icon.setAttribute("class", "fa fa-times");
 
         var span = document.createElement("span");
+        span.setAttribute("class", "search-category");
         span.innerText = category;
 
         category_delete.appendChild(category_delete_icon);
@@ -62,7 +64,7 @@ function getCategories() {
 
         select_category.prepend(option);
 
-        category = categoryList.shift();
+        category = category_list.shift();
     }
 }
 
@@ -114,7 +116,7 @@ function setCategories() {
     var show_categories = document.getElementById("show-categories");
 
     // 리스트에 존재하는 카테고리들을 복사한다. (참조없이)
-    var category_list = JSON.parse(JSON.stringify(categories));
+    var category_list = JSON.parse(JSON.stringify(categoryList));
 
     // 복사한 리스트를 하나씩 꺼내며(pop) 카테고리 요소에 추가한다.
     do {
@@ -235,12 +237,12 @@ function addCategoryFunc() {
     input_category.value = "";
 
     // 리스트에 값이 존재하거나 입력 값이 비어있는지 검사한다.
-    if (categories.indexOf(category_name) != -1 || category_name.length == 0) {
+    if (categoryList.indexOf(category_name) != -1 || category_name.length == 0) {
         // 리스트에 값이 있거나 입력 값이 비어있는 경우 경우
         return;
     } else {
         // 리스트에 값이 없을 경우
-        categories.push(category_name);
+        categoryList.push(category_name);
         categorySelectUpdate(category_name);
         return;
     }
@@ -373,7 +375,7 @@ function saveContent() {
         addCategory(create_category);
 
         // 저장된 카테고리 스토리지에 저장
-        localStorage.setItem("categories", JSON.stringify(categories));
+        localStorage.setItem("categories", JSON.stringify(categoryList));
     }
 
     /* 최근 글 본문 설정 */
@@ -447,6 +449,7 @@ function createCategory(parent, categoryName) {
 
     // 검색 기능을 만들면 수정 필요
     var span = document.createElement("span");
+    span.setAttribute("class", "search-category");
     span.innerText = categoryName;
 
     category_delete.appendChild(category_delete_icon);
@@ -698,10 +701,10 @@ function search() {
 
 // 각 카테고리에 이벤트를 추가한다.
 function loadCategories() {
-    var search_category = document.getElementsByClassName("category-content");
+    var search_category = document.getElementsByClassName("search-category");
     [].forEach.call(search_category, function(category) {
         category.addEventListener("click", function() {
-            searchContent(category.dataset.category, "category");
+            searchContent(this.parentNode.dataset.category, "category");
         })
     })
 }
@@ -1062,3 +1065,40 @@ function contentParsing(parsingString="") {
         }
     }
 }
+
+// 카테고리 삭제
+var category_delete_buttons = document.getElementsByClassName("category-delete");
+[].forEach.call(category_delete_buttons, function(category_delete) {
+    category_delete.addEventListener("click", function() {
+        var category = this.parentNode.dataset.category;
+
+        // 저장된 콘텐츠 중 해당되는 카테고리를 없앤다.
+        var categories = JSON.parse(localStorage.getItem("categories"));
+        localStorage.removeItem("categories");
+        categories.splice(categories.indexOf(category), 1);
+        localStorage.setItem("categories", JSON.stringify(categories));
+
+        // 저장된 콘텐츠 중 해당되는 카테고리와 동일한 글의 카테고리를 없앤다.
+        var contents = JSON.parse(localStorage.getItem("contents"));
+        localStorage.removeItem("contents");
+        for (var i in contents) {
+            if(contents[i]["category"] === category) {
+                contents[i]["category"] = "none";
+            }
+        }
+        localStorage.setItem("contents", JSON.stringify(contents));
+        
+        this.parentNode.remove();
+    })
+})
+
+// 본문 삭제
+document.getElementById("content-delete-button").addEventListener("click", function() {
+    var contentValue = this.parentNode.parentNode.dataset.index;
+    var contents = JSON.parse(localStorage.getItem("contents"));
+    localStorage.removeItem("contents");
+    delete contents[contentValue];
+    localStorage.setItem("contents", JSON.stringify(contents));
+
+    prevPage(true);
+})
