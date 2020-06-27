@@ -189,6 +189,7 @@ function loadCommandButtonFunc() {
                 
                 selected.deleteContents();
                 selected.insertNode(node);
+                return;
             }
 
             document.getElementById("create-content").focus();
@@ -958,6 +959,7 @@ function contentParsing(parsingString="") {
                 str = str.replace("*", "<span class='content_list'>●</span>");
                 console.log(str);
             }
+            console.log("str: " + str);
 
             var elementClass = "";
             var elementName = "";
@@ -1017,11 +1019,20 @@ function contentParsing(parsingString="") {
                                 if (linkStr.indexOf("|") != -1) {
                                     // 외부 링크 (|가 있다)
                                     console.log("외부 링크 거는 중..");
+                                    if (linkStr.substr(0, 2) == "</") {
+                                        linkStr = linkStr.slice(linkStr.indexOf("<", 2));
+                                    }
+
                                     var link = linkStr.slice(0, linkStr.indexOf("|")); // 링크 부분
+                                    if (link.substr(0, 2) == "<a") {
+                                        link = link.slice(link.indexOf(">") + 1, link.indexOf("<", 3));
+                                    }
+
                                     var showStr = linkStr.slice(linkStr.indexOf("|") + 1); // 글자 부분
                                     
                                     // <a class='content=link' href='link'>showStr</a>
                                     elementContent += "<a class='content_link' href='" + link + "' target='_blank'>" + showStr + "</a>";
+                                    console.log("link: " + link);
 
                                 } else {
                                     console.log("내부 링크 거는 중..");
