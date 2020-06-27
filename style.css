@@ -715,6 +715,11 @@ aside {
     width: 1215px;
 }
 
+#update-head #update-category {
+    line-height: 30px;
+    border: 1px solid black;
+    padding: 5px 10px;
+}
 
 /* 글 수정 페이지 내용 부분 */
 #update-body, #update-foot {

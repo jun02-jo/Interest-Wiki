@@ -55,11 +55,15 @@ function getCategories() {
         // 글 작성 페이지에 있는 카테고리 선택 부분에 추가한다.
         var select_category = document.getElementById("select-category");
 
+        var update_category = document.getElementById("update-category");
+
         var option = document.createElement("option");
         option.value = category;
         option.innerText = category;
 
         select_category.prepend(option);
+
+        update_category.prepend(option);
 
         category = categoryList.shift();
     }
@@ -177,6 +181,8 @@ document.getElementById("create-new-category").addEventListener("click", functio
 function categorySelectUpdate(categoryName) {
     // select 요소를 가지고 온다.
     var select_category = document.getElementById("select-category");
+    // update 요소를 가지고 온다.
+    var update_category = document.getElementById("update-category");
 
     // option을 만든다. (value값은 카테고리 이름으로 정한다.)
     var option = document.createElement("option");
@@ -185,6 +191,8 @@ function categorySelectUpdate(categoryName) {
 
     // select 요소에 option을 카테고리 없음 위에 추가한다.
     select_category.prepend(option);
+
+    update_category.prepend(option);
 }
 
 // 카테고리 추가 화면을 끄는 기능
@@ -577,7 +585,7 @@ function updateContent(value) {
 
     // 제목, 카테고리, 내용 가져오기
     var title = document.getElementById("update-title");
-    var category = document.getElementById("select-category");
+    var category = document.getElementById("update-category");
     var content = document.getElementById("update-content");
 
     // 각 요소의 값들만 가져온다.
@@ -643,7 +651,7 @@ function updateContent(value) {
 
     /* 카테고리 설정 */
     if (update_category != "none"){
-        addCategory(create_category);
+        addCategory(update_category);
 
         // 저장된 카테고리 스토리지에 저장
         localStorage.setItem("categories", JSON.stringify(categories));
