@@ -153,9 +153,9 @@ window.onbeforeunload = function() {
 // 글 작성 페이지 이동을 위한 부분
 document.getElementById("create-button").addEventListener("click", function() {
     movePage('create');
-    loadCommandButtonFunc();
 })
 
+loadCommandButtonFunc();
 // 글 작성 버튼(굵게, 기울이기 등)을 눌렀을 때
 // 목차 혹은 소목차일 경우 굵게, 기울이기 등을 막기 위한 함수
 function loadCommandButtonFunc() {
@@ -167,34 +167,31 @@ function loadCommandButtonFunc() {
             // italic일 경우
             //  this.classList: ["create-command", "italic", value: "create-command italic"]
             var buttonType = this.classList[1];
+            var selection = window.getSelection();
+            var range = selection.getRangeAt(0);
             console.log(window.getSelection());
-            if (window.getSelection().anchorNode) {
-                selected = window.getSelection().getRangeAt(0);
+            if (selection.anchorNode) {
+                selected = range;
                 var selectedText = selected.toString();
                 console.log(selectedText);
             }
         
-            if (buttonType == "bold" || buttonType == "italic" || 
-            buttonType == "strikeThrough" || buttonType == "underline")  {
-                // 목차나 소목차가 아닐 경우 글자 스타일을 변경해준다.
-                if (selectedText.indexOf("===") != -1 || selectedText.indexOf("==") != -1) {
-                    alert("목차나 소목차는 수정하실 수 없습니다.");
-                    return;
-                } else {
+            if (selectedText.indexOf("===") != -1 || selectedText.indexOf("==") != -1) {
+                alert("목차나 소목차는 수정하실 수 없습니다.");
+            } else {
+                if (buttonType == "bold" || buttonType == "italic" || 
+                buttonType == "strikeThrough" || buttonType == "underline")  {
                     document.execCommand(buttonType);
+                } else if (buttonType == "link") {
+                    console.log("링크 붙임");
+                    // 선택한 부분 앞 뒤에 [[]]를 붙인다.
+                    var node = document.createElement("span");
+                    node.innerText = "[[" + selectedText + "]]";
+                    
+                    selected.deleteContents();
+                    selected.insertNode(node);
                 }
-            } else if (buttonType == "link") {
-                console.log("링크 붙임");
-                // 선택한 부분 앞 뒤에 [[]]를 붙인다.
-                var node = document.createElement("span");
-                node.innerText = "[[" + selectedText + "]]";
-                
-                selected.deleteContents();
-                selected.insertNode(node);
-                return;
             }
-
-            document.getElementById("create-content").focus();
         })
     })
 }
