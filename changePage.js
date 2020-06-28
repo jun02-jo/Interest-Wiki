@@ -35,7 +35,7 @@ function movePage(nextPageKey) {
 }
 
 // 이전 페이지로 돌아가는 함수
-function prevPage() {
+function prevPage(isContentRemove=false) {
     /* pagesData의 맨 뒤의 값(현재 페이지)을 가져와 페이지가 보이지 않도록 설정한다. */
     if (pagesData.length > 1) {
         var page = pagesData.pop()
@@ -51,6 +51,9 @@ function prevPage() {
         var prev = document.getElementById(prev_page);
         prev.style.display = "block";
         loadPage(page);
+        if (isContentRemove) {
+            loadPage(pages["new"]);
+        }
         currentPage = prev_page;
     }
 }
@@ -88,7 +91,7 @@ function pageClear(page, isClear=true) {
 }
 
 function loadPage(page) {
-    if (page == pages['new']) {        
+    if (page == pages['new']) {
         // contents를 가지고 온다.
         var contents = JSON.parse(localStorage.getItem("contents"));
         

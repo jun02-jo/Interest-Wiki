@@ -1,4 +1,5 @@
 var saveData = {};
+// var contents = {};
 var categoryList = [];
 var sectionValue = 0;
 var selected = undefined;
@@ -158,9 +159,8 @@ window.onbeforeunload = function() {
 // 글 작성 페이지 이동을 위한 부분
 document.getElementById("create-button").addEventListener("click", function() {
     movePage('create');
-    loadCommandButtonFunc();
-})
 
+loadCommandButtonFunc();
 // 글 작성 버튼(굵게, 기울이기 등)을 눌렀을 때
 // 목차 혹은 소목차일 경우 굵게, 기울이기 등을 막기 위한 함수
 function loadCommandButtonFunc() {
@@ -172,9 +172,11 @@ function loadCommandButtonFunc() {
             // italic일 경우
             //  this.classList: ["create-command", "italic", value: "create-command italic"]
             var buttonType = this.classList[1];
+            var selection = window.getSelection();
+            var range = selection.getRangeAt(0);
             console.log(window.getSelection());
-            if (window.getSelection().anchorNode) {
-                selected = window.getSelection().getRangeAt(0);
+            if (selection.anchorNode) {
+                selected = range;
                 var selectedText = selected.toString();
                 console.log(selectedText);
             }
@@ -241,6 +243,22 @@ function loadCommandButtonFunc2() {
             }
 
             document.getElementById("update-content").focus();
+            if (selectedText.indexOf("===") != -1 || selectedText.indexOf("==") != -1) {
+                alert("목차나 소목차는 수정하실 수 없습니다.");
+            } else {
+                if (buttonType == "bold" || buttonType == "italic" || 
+                buttonType == "strikeThrough" || buttonType == "underline")  {
+                    document.execCommand(buttonType);
+                } else if (buttonType == "link") {
+                    console.log("링크 붙임");
+                    // 선택한 부분 앞 뒤에 [[]]를 붙인다.
+                    var node = document.createElement("span");
+                    node.innerText = "[[" + selectedText + "]]";
+                    
+                    selected.deleteContents();
+                    selected.insertNode(node);
+                }
+            }
         })
     })
 }
@@ -1311,3 +1329,40 @@ function updateContent(value) {
     이전 페이지로 돌아가게 된다. */
     window.location.reload(true);
 }
+
+// 카테고리 삭제
+var category_delete_buttons = document.getElementsByClassName("category-delete");
+[].forEach.call(category_delete_buttons, function(category_delete) {
+    category_delete.addEventListener("click", function() {
+        var category = this.parentNode.dataset.category;
+
+        // 저장된 콘텐츠 중 해당되는 카테고리를 없앤다.
+        var categories = JSON.parse(localStorage.getItem("categories"));
+        localStorage.removeItem("categories");
+        categories.splice(categories.indexOf(category), 1);
+        localStorage.setItem("categories", JSON.stringify(categories));
+
+        // 저장된 콘텐츠 중 해당되는 카테고리와 동일한 글의 카테고리를 없앤다.
+        var contents = JSON.parse(localStorage.getItem("contents"));
+        localStorage.removeItem("contents");
+        for (var i in contents) {
+            if(contents[i]["category"] === category) {
+                contents[i]["category"] = "none";
+            }
+        }
+        localStorage.setItem("contents", JSON.stringify(contents));
+        
+        this.parentNode.remove();
+    })
+})
+
+// 본문 삭제
+document.getElementById("content-delete-button").addEventListener("click", function() {
+    var contentValue = this.parentNode.parentNode.dataset.index;
+    var contents = JSON.parse(localStorage.getItem("contents"));
+    localStorage.removeItem("contents");
+    delete contents[contentValue];
+    localStorage.setItem("contents", JSON.stringify(contents));
+
+    prevPage(true);
+})
