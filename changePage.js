@@ -6,8 +6,7 @@ var pages = {
     create: "main-create-screen",
     search: "main-search-screen",
     content: "main-content",
-    update: "update-screen",
-    return: "home.html"
+    update: "update-screen"
 };
 var pagesData = [pages["new"]];
 var currentPage = pagesData[0];
@@ -68,14 +67,7 @@ function pageClear(page, isClear=true) {
             title.value = "";
             category.value = "none";
             content.innerText = "";
-        } else if (page == pages['update']) {
-            var title = document.getElementById("update-title");
-            var content = document.getElementById("update-content");
-
-            title.innerText = "";
-            content.innerText = "";
-        }
-        else if(page == pages['search']) {
+        } else if(page == pages['search']) {
             // 더이상 검색 페이지가 없을 경우
             // 페이지를 비운다.
             var main_search_screen = document.getElementById("main-search-screen");

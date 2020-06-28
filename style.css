@@ -11,10 +11,11 @@
     font-style: normal;
 }
 
-/* 나눔 고닥 */
+/* 나눔 고딕 */
 @import url('https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800');
 
 * {
+    scroll-behavior: smooth;
     padding: 0;
     margin: 0;
     box-sizing: content-box;
@@ -70,7 +71,7 @@ header {
     padding: 2px 7px;
 }
 
-#search .wrong{
+.wrong {
     outline-color: red;
     outline-width: 10px;
     animation: wrong .65s ease-out;
@@ -213,7 +214,7 @@ aside {
 
 #create-form {
     background-color: white;
-    width: 1232px;
+    width: 100%;
     height: 100%;
     padding: 15px;
 }
@@ -245,10 +246,12 @@ aside {
     line-height: 30px;
     border: 1px solid black;
     padding: 5px 10px;
+    width: 13%;
+    text-align-last: center;
 }
 
 #create-category-button {
-    width: 10%;
+    width: 18%;
     border: 1px solid black;
     background-color: white;
     outline: 0;
@@ -374,28 +377,67 @@ aside {
     height: 80%;
 }
 
-#create-body #create-content {
-    border: 1px solid black;
-}
-
 #create-body #create-commands {
     height: 7%;
+    margin-bottom: 10px;
 }
 
 #create-commands .create-command {
-    display: inline-block;
+    float: left;
     background-color: white;
-    border: none;
+    border: 1px solid black;
     height: 30px;
     font-size: 14pt;
-    padding: 5px;
-    margin-right: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
 }
 
+/* #input-outside-link-box {
+    display: none;
+    position: absolute;
+    width: 200px;
+    height: 50px;
+    background-color: white;
+    border: 2px solid royalblue;
+    border-radius: 20px;
+    margin-left: 335px;
+    justify-content: center;
+    align-items: center;
+    animation: show .1s ease-in-out;
+}
+
+@keyframes show {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+#input-outside-link-box button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+#input-outside-link-box #close-outside-link {
+}
+
+#input-outside-link-box #input-outside-link {
+    width: 120px;
+    margin: 0 10px;
+}
+
+#input-outside-link-box #add-outside-link { 
+    width: 30px;
+} */
+
 #create-body #create-content {
+    border: 1px solid black;
     padding: 5px;
     height: 85%;
-    width: 1215px;
+    width: 99%;
     overflow: auto;
 }
 
@@ -496,7 +538,7 @@ aside {
     display: none;
     background-color: white;
     width: 100%;
-    height: 100%;
+    min-height: calc(100vh - 59px);
     padding-bottom: 2em;
 }
 
@@ -567,8 +609,7 @@ aside {
 #main-content {
     display: none;
     background-color: white;
-    width: 100%;
-    height: calc(100vh - 59px);
+    min-height: calc(100vh - 59px);
 }
 
 /* 본문 페이지 머리 부분 */
@@ -614,6 +655,7 @@ aside {
     transition: .3s;
     background-color: white;
     border: 1px solid black;
+    cursor: pointer;
 }
 
 #content-buttons > button:hover {
@@ -644,6 +686,8 @@ aside {
 
 #content-toc {
     font-family: 'Nanum Gothic', sans-serif;
+    font-size: 14pt;
+    font-weight: bold;
 }
 
 #content-toc-nav {
@@ -655,11 +699,38 @@ aside {
     margin-top: 0.5em;
 }
 
+#content-toc-nav .toc-small {
+    margin-left: 1em;
+}
+
+#content-toc-nav .toc-big a{
+    font-size: 16pt;
+    font-weight: bold;
+    color: #000;
+}
+
+#content-toc-nav .toc-small a {
+    font-size: 13pt;
+    font-weight: bold;
+    color: #000;
+}
+
+#content-toc-nav .toc-big-number {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #0a0aaa;
+}
+
+#content-toc-nav .toc-small-number {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #0a0aaa;
+}
 
 /* 본문 페이지 본문 부분 */
 #content-body {
     position: relative;
-    padding: 1em 1.5em;
+    padding: 1em 2em 1em 1.5em;
     border-top: 1px solid black;
     width: 93%;
     left: 50%;
@@ -678,12 +749,75 @@ aside {
 }
 
 #content-content {
-    width: 1211px;
+    width: 100%;
     padding-right: 1.5em;
 }
 
+#content-content {
+    font-size: 13pt;
+}
 
-/* 글 수정 페이지 */
+#content-body .toc-big,
+#content-body .toc-small {
+    display: block;
+    font-size: 16pt;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 0.5em;
+    padding: 1em 0.5em 0.5em 0.5em;
+    border-bottom: 2px dashed #777777;
+}
+
+#content-body .toc-big-number,
+#content-body .toc-small-number {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #0a0aaa;
+}
+
+.toc-line {
+    margin-left: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+#content-up-button {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    font-size: 40px;
+    margin-right: 45px;
+    margin-bottom: 20px;
+    transition: .5s;
+    z-index: 2;
+}
+
+#content-up-button i {
+    color: #0f0f0f;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+#content-up-button:hover {
+    transform: scale(1.2);
+}
+
+.content_link {
+    color: royalblue;
+    cursor: pointer;
+}
+
+.havent_content_link {
+    color: red;
+    cursor: pointer;
+}
+
+.content_list {
+    font-size: 6pt;
+    margin-left: 10pt;
+}
+
+
+/* 수정 페이지 */
 #update-screen {
     display: none;
     width: 100%;
@@ -692,12 +826,12 @@ aside {
 
 #update-form {
     background-color: white;
-    width: 1232px;
+    width: 100%;
     height: 100%;
     padding: 15px;
 }
 
-/* 글 수정 페이지 제목 부분 */
+/* 글 수정 첫 부분 */
 #update-head, #update-body {
     margin-bottom: 15px;
 }
@@ -708,20 +842,20 @@ aside {
 }
 
 #update-head #update-title {
-    border: 1px solid black;
-    font-family: 'Nanum Gothic', sans-serif;
-    font-size: 3.2em;
-    font-weight: bold;
-    width: 1215px;
+    width: 70%;
+    padding: 4pt;
+    margin-right: 10px;
 }
 
 #update-head #update-category {
     line-height: 30px;
     border: 1px solid black;
     padding: 5px 10px;
+    width: 13%;
+    text-align-last: center;
 }
 
-/* 글 수정 페이지 내용 부분 */
+/* 글 수정 중간 */
 #update-body, #update-foot {
     padding-left: 5px;
 }
@@ -730,33 +864,31 @@ aside {
     height: 80%;
 }
 
-#update-body #update-content {
-    border: 1px solid black;
-}
-
 #update-body #update-commands {
     height: 7%;
+    margin-bottom: 10px;
 }
 
 #update-commands .update-command {
-    display: inline-block;
+    float: left;
     background-color: white;
-    border: none;
+    border: 1px solid black;
     height: 30px;
     font-size: 14pt;
-    padding: 5px;
-    margin-right: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
 }
 
 #update-body #update-content {
+    border: 1px solid black;
     padding: 5px;
     height: 85%;
-    width: 1215px;
+    width: 99%;
     overflow: auto;
 }
 
 
-/* 글 수정 페이지 버튼 */
+/* 글 수정 끝 부분 */
 #update-foot {
     float: right;
 }
@@ -771,4 +903,4 @@ aside {
     border: 1px solid black;
     background-color: white;
     padding: 10px 20px;
-}
+}  

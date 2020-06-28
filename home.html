@@ -154,11 +154,22 @@
                         </div>
                         <div id="create-body">
                             <div id="create-commands">
-                                <button class="create-command bold" onclick="document.execCommand('bold')">
+                                <!-- 취소선, 밑 줄, 링크, 목차, 소목차... -->
+                                <button class="create-command bold">
                                     <b>굵게</b>
                                 </button>
-                                <button class="create-command italic" onclick="document.execCommand('italic')">
+                                <button class="create-command italic">
                                     <i>기울이기</i>
+                                </button>
+                                <button class="create-command strikeThrough">
+                                    <del>취소선</del>
+                                </button>
+                                <button class="create-command underline">
+                                    <ins>밑줄</ins>
+                                </button>
+                                <button class="create-command link">
+                                    <i class="fa fa-paperclip fa-flip-horizontal"></i>
+                                    링크
                                 </button>
                                 <!-- ... -->
                             </div>
@@ -170,23 +181,33 @@
                     </div>
                 </article>
 
-                <!-- 수정 페이지 -->
                 <article id="update-screen">
+                <!-- 수정 페이지 -->
                     <div id="update-form">
                         <div id="update-head">
-                            <div id="update-title" contenteditable="true"></div>
+                            <input type="text" id="update-title">
                             <!-- 카테고리 선택 -->
                             <select id="update-category">
-                                <option id="category-none" value="none">카테고리 없음</option>
+                                <option id="category-update" value="none">카테고리 없음</option>
                             </select>
                         </div>
                         <div id="update-body">
                             <div id="update-commands">
-                                <button class="update-command bold" onclick="document.execCommand('bold')">
+                               <button class="update-command bold">
                                     <b>굵게</b>
                                 </button>
-                                <button class="update-command italic" onclick="document.execCommand('italic')">
+                                <button class="update-command italic">
                                     <i>기울이기</i>
+                                </button>
+                                <button class="update-command strikeThrough">
+                                    <del>취소선</del>
+                                </button>
+                                <button class="update-command underline">
+                                    <ins>밑줄</ins>
+                                </button>
+                                <button class="update-command link">
+                                    <i class="fa fa-paperclip fa-flip-horizontal"></i>
+                                    링크
                                 </button>
                                 <!-- ... -->
                             </div>
@@ -198,11 +219,6 @@
                         </div>
                     </div>
                 </article>
-
-
-
-
-
 
                 <article id="main-search-screen">
                     <button class="prev" onclick="prevPage()"><</button>
@@ -237,6 +253,11 @@
                         </li> -->
                     </ul>
                     <!-- 미리보기 부분입니다. -->
+                    <div id="content-up-button">
+                        <a href="#container">
+                            <i class="fa fa-arrow-circle-up"></i>
+                        </a>
+                    </div>
                 </article>
 
                 <arcitle id="main-content">
@@ -253,8 +274,8 @@
                     </div>
                     <div id="content-nav">
                         <div id="content-toc">목차</div>
-                        <ul id="content-toc-nav">
-                            <!-- 미리보기 부분입니다. -->
+                        <!-- 미리보기 부분입니다. -->
+                        <!-- <ul id="content-toc-nav">
                             <li>
                                 <a href="#" style="color: #04046d;">
                                     1. ~~~
@@ -280,17 +301,23 @@
                                     2.1 ~~~
                                 </a>
                             </li>
-                            <!-- 미리보기 부분입니다. -->
-                        </ul>
+                        </ul> -->
+                        <!-- 미리보기 부분입니다. -->
                     </div>
                     <div id="content-body">
+                        <div id="content-content"></div>
                         <!-- 미리보기 부분입니다. -->
-                        <p id="content-content"></p>
+                        <!-- <p id="content-content"></p> -->
                         <!-- Lorem ipsum dolor, sit amet consectetur adipisicing elit.
                         Deleniti, aspernatur ullam minima quasi enim iste ab dolorem,
                         nobis incidunt nostrum placeat natus aperiam omnis mollitia modi
                         quod soluta optio. Nisi. -->
                         <!-- 미리보기 부분입니다. -->
+                    </div>
+                    <div id="content-up-button">
+                        <a href="#container">
+                            <i class="fa fa-arrow-circle-up"></i>
+                        </a>
                     </div>
                 </arcitle>
             </section>

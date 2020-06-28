@@ -2,6 +2,7 @@ var saveData = {};
 // var contents = {};
 var categories = [];
 var sectionValue = 0;
+var selected = undefined;
 
 
 window.onload = initData();
@@ -55,18 +56,12 @@ function getCategories() {
         // 글 작성 페이지에 있는 카테고리 선택 부분에 추가한다.
         var select_category = document.getElementById("select-category");
 
-        var update_category = document.getElementById("update-category");
-
         var option = document.createElement("option");
         option.value = category;
         option.innerText = category;
 
         select_category.prepend(option);
-
-        update_category.prepend(option);
-
-        category = categoryList.shift();
-    }
+    };
 }
 
 
@@ -138,7 +133,109 @@ function setCategories() {
 }
 
 
-/* 생성 부분 */
+/* 생성(글 작성) 부분 */
+
+// 글 작성 시 새로고침, 탭 닫기 방지
+window.onbeforeunload = function() {
+    if (currentPage == pages["create"]) {
+        if (confirm("작성하던 글이 저장되지 않습니다.\n정말 탭을 닫으시겠습니까?")) {
+            event.returnValue = true;
+        } else {
+            event.returnValue = false;
+        }
+    }
+}
+
+// 글 작성 페이지 이동을 위한 부분
+document.getElementById("create-button").addEventListener("click", function() {
+    movePage('create');
+    loadCommandButtonFunc();
+})
+
+// 글 작성 버튼(굵게, 기울이기 등)을 눌렀을 때
+// 목차 혹은 소목차일 경우 굵게, 기울이기 등을 막기 위한 함수
+function loadCommandButtonFunc() {
+    var commands = document.getElementsByClassName("create-command");
+    [].forEach.call(commands, function(command) {
+        command.addEventListener("click", function() {
+            // bold일 경우 
+            //  this.classList: ["create-command", "bold", value: "create-command bold"]
+            // italic일 경우
+            //  this.classList: ["create-command", "italic", value: "create-command italic"]
+            var buttonType = this.classList[1];
+            console.log(window.getSelection());
+            if (window.getSelection().anchorNode) {
+                selected = window.getSelection().getRangeAt(0);
+                var selectedText = selected.toString();
+                console.log(selectedText);
+            }
+        
+            if (buttonType == "bold" || buttonType == "italic" || 
+            buttonType == "strikeThrough" || buttonType == "underline")  {
+                // 목차나 소목차가 아닐 경우 글자 스타일을 변경해준다.
+                if (selectedText.indexOf("===") != -1 || selectedText.indexOf("==") != -1) {
+                    alert("목차나 소목차는 수정하실 수 없습니다.");
+                    return;
+                } else {
+                    document.execCommand(buttonType);
+                }
+            } else if (buttonType == "link") {
+                console.log("링크 붙임");
+                // 선택한 부분 앞 뒤에 [[]]를 붙인다.
+                var node = document.createElement("span");
+                node.innerText = "[[" + selectedText + "]]";
+                
+                selected.deleteContents();
+                selected.insertNode(node);
+                return;
+            }
+
+            document.getElementById("create-content").focus();
+        })
+    })
+}
+
+function loadCommandButtonFunc2() {
+    var commands = document.getElementsByClassName("update-command");
+    [].forEach.call(commands, function(command) {
+        command.addEventListener("click", function() {
+            // bold일 경우 
+            //  this.classList: ["create-command", "bold", value: "create-command bold"]
+            // italic일 경우
+            //  this.classList: ["create-command", "italic", value: "create-command italic"]
+            var buttonType = this.classList[1];
+            console.log(window.getSelection());
+            if (window.getSelection().anchorNode) {
+                selected = window.getSelection().getRangeAt(0);
+                var selectedText = selected.toString();
+                console.log(selectedText);
+            }
+        
+            if (buttonType == "bold" || buttonType == "italic" || 
+            buttonType == "strikeThrough" || buttonType == "underline")  {
+                // 목차나 소목차가 아닐 경우 글자 스타일을 변경해준다.
+                if (selectedText.indexOf("===") != -1 || selectedText.indexOf("==") != -1) {
+                    alert("목차나 소목차는 수정하실 수 없습니다.");
+                    return;
+                } else {
+                    document.execCommand(buttonType);
+                }
+            } else if (buttonType == "link") {
+                console.log("링크 붙임");
+                // 선택한 부분 앞 뒤에 [[]]를 붙인다.
+                var node = document.createElement("span");
+                node.innerText = "[[" + selectedText + "]]";
+                
+                selected.deleteContents();
+                selected.insertNode(node);
+                return;
+            }
+
+            document.getElementById("update-content").focus();
+        })
+    })
+}
+
 // 카테고리 추가 버튼을 눌렀을 때
 document.getElementById("create-category-button").addEventListener("click", function() {
     // 카테고리 추가 화면을 보이도록 설정한다.
@@ -147,10 +244,22 @@ document.getElementById("create-category-button").addEventListener("click", func
 
     var create_category = document.getElementById("create-category");
     create_category.style.display = "block";
+
+    document.getElementById("create-category-name").focus();
 });
 
 // 카테고리 추가하는 함수
-document.getElementById("create-new-category").addEventListener("click", function () {
+// 엔터키 누름
+document.getElementById("create-category-name").onkeydown = function() {
+    if (event.keyCode == 13) {
+        addCategoryFunc();
+    }
+}
+
+// 버튼 클릭
+document.getElementById("create-new-category").addEventListener("click", addCategoryFunc);
+
+function addCategoryFunc() {
     // 카테고리 추가 화면을 보이지 않도록 설정한다.
     var create_category_dummy = document.getElementById("create-category-dummy");
     create_category_dummy.style.display = "none";
@@ -175,14 +284,12 @@ document.getElementById("create-new-category").addEventListener("click", functio
         categorySelectUpdate(category_name);
         return;
     }
-});
+}
 
 // 카테고리를 선택하는 부분의 데이터를 업데이트 하는 함수이다.
 function categorySelectUpdate(categoryName) {
     // select 요소를 가지고 온다.
     var select_category = document.getElementById("select-category");
-    // update 요소를 가지고 온다.
-    var update_category = document.getElementById("update-category");
 
     // option을 만든다. (value값은 카테고리 이름으로 정한다.)
     var option = document.createElement("option");
@@ -191,8 +298,6 @@ function categorySelectUpdate(categoryName) {
 
     // select 요소에 option을 카테고리 없음 위에 추가한다.
     select_category.prepend(option);
-
-    update_category.prepend(option);
 }
 
 // 카테고리 추가 화면을 끄는 기능
@@ -244,6 +349,25 @@ function saveContent() {
     var create_content = content.innerText;
     var create_content_html = content.innerHTML;
 
+    // 타이틀의 글자 수를 검사한다.
+    if (titleStrLengthCheck()) {
+        return;
+    }
+
+    // 저장된 글 중 같은 제목이 있는지 검사한다.
+    var titles = JSON.parse(localStorage.getItem("contents"));
+    for (var i in titles) {
+        console.log(titles[i]["title"]);
+        // 만약 같은 제목이 있다면
+        if (titles[i]["title"] == title.value) {
+            // 경고창을 띄우고 제목 입력창을 비운다.
+            alert("같은 제목의 글이 있습니다.");
+            title.value = "";
+            title.focus();
+            return;
+        }
+    }
+
     /* 만약 비어있는 경우에 저장을 누르면 이상하게 작동하므로
     경고 문구를 띄워준다. */
     if (create_title == "") {
@@ -261,8 +385,8 @@ function saveContent() {
     // 제목, 카테고리, 내용을 객체로 저장함
     saveData["title"] = create_title;
     saveData["category"] = create_category;
-    saveData["content"] = create_content;
-    saveData["html"] = create_content_html;
+    saveData["content"] = convertContent(create_content);
+    saveData["html"] = contentParsing(create_content_html);
     
     // 객체 저장
     saveContentData()
@@ -363,6 +487,7 @@ function createCategory(parent, categoryName) {
 
     // 검색 기능을 만들면 수정 필요
     var span = document.createElement("span");
+    span.setAttribute("class", "search-category");
     span.innerText = categoryName;
 
     category_delete.appendChild(category_delete_icon);
@@ -389,32 +514,32 @@ function saveContentData() {
 // 글 작성 시 제목의 글자 수가 30자를 넘어가지 않도록 한다.
 document.getElementById("create-title").onkeydown = function() {
     // 입력받을 최대 글자 수(30자)를 넘어갈 경우 경고창을 내보낸다
-    // console.log(event);
-    // console.log(event.keyCode);
-    var str = document.getElementById("create-title").value;
-    var maxLength = 30;
-    var strCheck = false;
-
+    
     // 특정 키는 글자 수를 검사하는데 포함시키지 않는다.
-    if ((event.keyCode == 8 || event.keyCode == 46 || event.keyCode == 16 ||
+    if (!(event.keyCode == 8 || event.keyCode == 46 || event.keyCode == 16 ||
         event.keyCode == 17 || event.keyCode == 18 || event.keyCode == 20 ||
         event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
         event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 39 ||
         event.keyCode == 40 || event.keyCode == 36 || event.keyCode == 35 ||
         event.keyCode == 33 || event.keyCode == 34 || event.keyCode == 45 ||
         event.keyCode == 145 || event.keyCode == 19 || event.keyCode == 91 ||
-        event.keyCode == 116 || 
-        (event.ctrlKey == true && event.key == 'a') ||
-        (event.ctrlKey == true && event.keyCode == 'w')))
+        event.keyCode == 116 || event.keyCode == 123 ||
+        (event.ctrlKey == true && event.keyCode == 'A'.charCodeAt())
+        ))
     {
-        strCheck = false;
-    } else {
-        strCheck = true;
+        titleStrLengthCheck();
     }
+}
 
-    if (strCheck && (str.length >= maxLength)) {
-        alert("제목은 30자 이상 작성하실 수 없습니다.");
-        document.getElementById("create-title").value = str.substring(0, maxLength);
+function titleStrLengthCheck() {
+    var maxLength = 30;
+    var str = document.getElementById("create-title").value;
+
+    if (str.length >= maxLength) {
+        alert("제목은 " + maxLength + "자 이상 작성하실 수 없습니다.");
+        // document.getElementById("create-title").value = str.substring(0, maxLength - 1);
+        document.getElementById("create-title").value = "";
+        return true;
     }
 }
 
@@ -426,27 +551,180 @@ window.addEventListener("mouseup", function() {
 
 /* 본문 페이지 */
 function getContent(value) {
+    var toc = {
+        big: "toc-big",
+        small: "toc-small",
+        line: "toc-line"
+    };
     movePage('content');
+    // 해당 내용을 가지고 온다.
     var content = JSON.parse(localStorage.getItem("contents"))[value];
+
+    // 목차를 설정하는 함수
+    function setToc() {
+        var parent = document.getElementById("content-toc-nav");
+        if (parent != null) {
+            parent.remove();
+        }
+
+        var tocContent = JSON.parse(content["html"]);
+        var tocBig = 0;
+        var tocSmall = 0;
+
+        var content_nav = document.getElementById("content-nav");
+        // 목차를 추가할 부모 요소
+        var content_toc_nav = document.createElement("ul");
+        content_toc_nav.setAttribute("id", "content-toc-nav");
+
+        // toc[i]: [class, name, content]
+        for (var i = 0; i < tocContent.length; i++) {
+            if (tocContent[i][0] != toc.line) {
+                var value_class = tocContent[i][0];
+                var value_name = tocContent[i][1];
+                var value_content = tocContent[i][2];
+
+                // 목차나 소목차일 경우에만 목차에 추가한다.
+                // li 요소 추가
+                var toc_li = document.createElement("li");
+                var toc_a = document.createElement("a");
+
+                if (value_class == toc.big) {
+                    toc_li.setAttribute("class", value_class + " " + ++tocBig);
+                    tocSmall = 0;
+
+                    var span = document.createElement("span");
+                    span.setAttribute("class", value_class + "-number");
+                    span.innerText = tocBig + ".";
+
+                    toc_a.setAttribute("href", "#" + value_name);
+                    toc_a.setAttribute("name", "toc-" + value_name);
+
+                    toc_a.appendChild(span);
+                    toc_a.innerHTML += " " + value_content;
+                } else if (value_class == toc.small){
+                    toc_li.setAttribute("class", value_class + " " + ++tocSmall);
+
+                    var span = document.createElement("span");
+                    span.setAttribute("class", value_class + "-number");
+                    span.innerText = tocBig + "." + tocSmall;
+
+                    toc_a.setAttribute("href", "#" + value_name);
+                    toc_a.setAttribute("name", "toc-" + value_name);
+                    
+                    toc_a.appendChild(span);
+                    toc_a.innerHTML += " " + value_content;
+                }
+
+                toc_li.appendChild(toc_a);
+                content_toc_nav.appendChild(toc_li);
+            }
+        }
+        content_nav.appendChild(content_toc_nav);
+    }
+    setToc();
 
     var content_head = document.getElementById("content-head");
     content_head.dataset.index = value;
 
     // 본문 페이지의 타이틀, 본문 요소를 가지고 온다.
     var content_title = document.getElementById("content-title");
-    var content_content = document.getElementById("content-content");
+    var content_body = document.getElementById("content-body");
 
     content_title.innerText = content["title"];
-    content_content.innerHTML = content["html"];
+    // content_content.innerHTML = content["html"];
+    // html을 검사하여 목차를 어떻게 잘 만든다.
+    setContent();
+    function setContent() {
+        var parent = document.getElementById("content-content");
+        if (parent != null) {
+            parent.remove();
+        }
 
+        var contentList = JSON.parse(content["html"]);
+        var contentLine = 1;
+        var tocBig = 0;
+        var tocSmall = 0;
+
+        // 전체 내용의 부모요소
+        var content_content = document.createElement("div");
+        content_content.setAttribute("id", "content-content");
+
+        for (var i = 0; i < contentList.length; i++) {
+            var value_class = contentList[i][0];
+            var value_name = contentList[i][1];
+            var value_content = contentList[i][2];
+
+            if (value_class == toc.line) {
+                var content_div = document.createElement("div");
+                content_div.setAttribute("class", value_class + " " + contentLine++);
+                content_div.innerHTML = value_content;
+                
+                content_content.appendChild(content_div);
+            } else if (value_class == toc.big) {
+                var content_a = document.createElement("a");
+                content_a.setAttribute("class", value_class + " " + ++tocBig);
+                content_a.setAttribute("href", "#" + "container");
+                content_a.setAttribute("id", value_name);
+                //ex) <div class="toc-big 1"></div>
+
+                var span = document.createElement("span");
+                span.setAttribute("class", value_class + "-number");
+                span.innerText = tocBig + ".";
+                /*ex) <div class="toc-big 1">
+                    <span class="toc-big-number">1.</span>
+                </div> */
+
+                content_a.appendChild(span);
+                content_a.innerHTML += " " + value_content;
+                /*ex) <div class="toc-big 1">
+                    <span class="toc-big-number">1.</span> 내용
+                </div> */
+                tocSmall = 0;                   
+
+                content_content.appendChild(content_a);             
+            } else if (value_class == toc.small) {
+                var content_a = document.createElement("a");
+                content_a.setAttribute("class", value_class + " " + ++tocSmall);
+                content_a.setAttribute("href", "#" + "container");
+                content_a.setAttribute("id", value_name);
+                //ex) <div class="toc-small 1"></div>
+
+                var span = document.createElement("span");
+                span.setAttribute("class", value_class + "-number");
+                span.innerText = tocBig + "." + tocSmall;
+                /*ex) <div class="toc-small 1">
+                    <span class="toc-small-number">1.1</span>
+                </div> */
+
+                content_a.appendChild(span);
+                content_a.innerHTML += " " + value_content;
+                /*ex) <div class="toc-small 1">
+                    <span class="toc-small-number">1.1</span> 내용
+                </div> */
+
+                content_content.appendChild(content_a);
+            }
+        }
+        content_body.appendChild(content_content);
+    }
     document.getElementById("content-update-button").addEventListener("click", function(){
         updatePage(content_head.dataset.index);
+        loadCommandButtonFunc2();
     });
 }
 
 
 /* 검색 기능 */
-document.getElementById("search-button").addEventListener("click", function() {
+document.getElementById("search-text").onkeydown = function() {
+    // 엔터 키를 누를 시
+    if (event.keyCode == 13) {
+        search();
+    }
+}
+
+document.getElementById("search-button").addEventListener("click", search);
+
+function search() {
     var search_text = document.getElementById("search-text");
     var value = search_text.value;
     if (value == "") {
@@ -461,14 +739,14 @@ document.getElementById("search-button").addEventListener("click", function() {
     } else {
         searchContent(value, "title");
     }
-});
+}
 
 // 각 카테고리에 이벤트를 추가한다.
 function loadCategories() {
-    var search_category = document.getElementsByClassName("category-content");
+    var search_category = document.getElementsByClassName("search-category");
     [].forEach.call(search_category, function(category) {
         category.addEventListener("click", function() {
-            searchContent(category.dataset.category, "category");
+            searchContent(this.parentNode.dataset.category, "category");
         })
     })
 }
@@ -550,35 +828,320 @@ function addSearchedContent(content, index) {
     searched.appendChild(li);
 }
 
+/* 목차 등을 나타내는 특수 문자들을 제외한 글자들을 반환한다.*/
+function convertContent(convertingStr="") {
+    console.log(convertingStr);
+    console.log("변환 시작");
+    // 목차, 소목차를 나타내는 =를 없앤다.
+    var convertStr = convertingStr.replace(/=/gi, "");
+    var str = "";
+    var linkStr = "";
+
+    // 링크 관련된 부분 중 불필요한 부분을 없앤다.
+    // [[, ]], |, 외부 링크 등
+    // convertStr이 빌 때 까지 반복
+    while (!(convertStr == "")) {
+        try {
+            if (convertStr.indexOf("[[") == -1) {
+                // 만약 링크가 없다면
+                throw new Error("변환할 부분이 없습니다.");
+            } else {
+                // 일단 [[ 전까지의 문자열을 저장한다.
+                str += convertStr.slice(0, convertStr.indexOf("[["));
+
+                // [[의 뒷부분을 가지고 온다.
+                convertStr = convertStr.slice(convertStr.indexOf("[[") + 2);
+
+                // 링크에 관련된 문자열을 가지고 온다.
+                linkStr = convertStr.slice(0, convertStr.indexOf("]]"));
+                if (linkStr.indexOf("|") == -1) {
+                    // 외부 링크가 없다면 그냥 저장한다.
+                    str += linkStr;
+                } else {
+                    // 외부 링크가 있다면 글자 부분만 가지고 온다.
+                    var showStr = linkStr.slice(linkStr.indexOf("|") + 1);
+                    str += showStr;
+                }
+
+                // 남은 부분을 저장한다.
+                convertStr = convertStr.slice(convertStr.indexOf("]]") + 2);
+            }
+        } catch (e) {
+            str += convertStr;
+            convertStr = "";
+        }
+    }
+
+    console.log("변환 후");
+    console.log(str);
+    console.log(typeof str);
+    return str;
+}
+
+document.getElementById("create-content").onkeydown = function() {
+    // 탭 키를 눌렀을 때
+    if (event.keyCode == 9) {
+        document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
+        event.preventDefault();
+    }
+
+    if (this.innerText == "===") {
+        alert("내용의 첫 글자에는 ===를 사용하실 수 없습니다.\n == 또는 글자를 입력해주세요.");
+        this.innerText = "";
+    } else if (this.innerText == "<") {
+        alert("내용의 첫 글자에는 <를 사용하실 수 없습니다.\n역슬래쉬(\\)를 붙이시거나 다른 글자를 입력해주세요.");
+        this.innerText = "";
+    }
+}
+
+/* 작성한 글을 구문 분석(파싱)을 통해 html을 반환한다. */
+function contentParsing(parsingString="") {
+    console.log("들어온 문자열: ", parsingString);
+    // 인자로 들어온 문자열을 복사한다.
+    var parseStr = parsingString;
+
+    // 나누어진 문자열을 담을 리스트 변수
+    var strs = [];
+    // strs의 인덱스를 나타내는 변수
+    var index = 0;
+
+    // indexOf로 찾은 인덱스 번호를 나타내는 변수
+    var findIndex = 0;
+
+    // [elementClass, elementname, elementContent]
+    // 반환할 변수
+    var parsedContent = [];
+
+    // 목차, 소목차, 그냥 문장을 나타내는 객체
+    var toc = {
+        big: "toc-big",
+        small: "toc-small",
+        line: "toc-line"
+    };
+
+    console.log("start while");
+    // 맨 먼저 각 문장 별로 나누어 리스트에 담는다.
+    while (parseStr != "") {
+        console.log(strs);
+        try {
+            if (parseStr.substr(0, 5) === "<div>") {
+                console.log("<div> 시작");
+                // 붙여넣기를 했을 경우 맨 처음은 <div>로 시작한다.
+                // 첫 번째줄이 스타일을 변형한 경우에는 무시한다.
+                // 즉, <div>로만 나눈다.
+
+                // <div>를 제외한 시작 인덱스
+                var startIndex = 5;
+                // 끝 부분을 찾는다.
+                findIndex = parseStr.indexOf("</div>", startIndex);
+
+                strs[index] = parseStr.substring(startIndex, findIndex);
+
+                // 시작 인덱스 이후로 나타나는 <div>를 찾는다.
+                if (parseStr.indexOf("<div>", startIndex) == -1) {
+                    throw new Error("더이상 찾을 문자열이 없습니다.");
+                }
+                findIndex = parseStr.indexOf("<div>", startIndex);
+                parseStr = parseStr.slice(findIndex);
+                index++;
+            } else {
+                console.log("시작");
+                // 붙여넣기를 하지 않을 경우 처음은 <div>로 시작하지 않는다.
+                // 단, 스타일을 변형했을 경우에는 <~>로 시작한다.
+
+                // <div>를 찾는다.
+                if (parseStr.indexOf("<div>") == -1) {
+                    strs[index] = parseStr;
+                    throw new Error("더이상 찾을 문자열이 없습니다.");
+                }
+                findIndex = parseStr.indexOf("<div>");
+
+                // 리스트 변수안에 문자열을 추가한다.
+                strs[index] = parseStr.substring(0, findIndex);
+
+                // 찾은 문자열을 제외하고 남은 문자열을 저장한다.
+                parseStr = parseStr.slice(findIndex);
+                index++;
+            }
+        } catch (e) {
+            console.log(e);
+            parseStr = "";
+        }
+            
+    }
+    console.log("end while");
+
+    for (var i = 0; i <= index; i++) {
+        // strParsing의 반환값은 리스트이다.
+        parsedContent[i] = extractFromStr(strs[i]);
+    }
+
+    // 반환
+    console.log(parsedContent);
+    return JSON.stringify(parsedContent);
+
+    // 문자열에서 필요한 정보만 추출한다.
+    function extractFromStr(eStr="") {
+        console.log("extractFromStr");
+        console.log(eStr);
+        var element = [];
+    
+        strParsing(eStr);
+
+        // [[class, name, content]]의 형태
+        // extractFromStr의 return이다.
+        return element;
+
+
+        // 문자열을 분석한다.
+        function strParsing(str="") {
+            console.log("strParsing");
+            str.replace(/^ /gi, "");
+            if (str[0] == "*") {
+                console.log("리스트");
+                str = str.replace("*", "<span class='content_list'>●</span>");
+                console.log(str);
+            }
+            console.log("str: " + str);
+
+            var elementClass = "";
+            var elementName = "";
+            var elementContent = ""; // html형태로 저장된다.
+            var inputText = "";
+    
+            if (str.substr(0, 3) == "===") {
+                // 소목차
+                inputText = str.substring(3, str.indexOf("=", 3));
+
+                elementClass = toc.small;
+                elementName = inputText;
+                elementContent = inputText;
+            } else if (str.substr(0, 2) == "==") {
+                // 목차
+                inputText = str.substring(2, str.indexOf("=", 2));
+
+                elementClass = toc.big;
+                elementName = inputText;
+                elementContent = inputText;
+            } else {
+                elementClass = toc.line;
+                elementName = "";
+
+                // 문장 안에 링크가 있나 없나 검사해야 함
+                if (str.indexOf("[[") == -1) {
+                    // 링크가 없으면 바로 저장
+                    elementContent = str;
+                } else {
+                    var linkStr = "";
+
+                    // 만약 링크가 있다면 여러개가 있을 수 있으므로
+                    // 반복해서 검사한다.
+                    while (str != "") {
+                        // str이 빌 때 까지 검사한다.
+                        try {
+                            if (str.indexOf("[[") == -1) {
+                                // 만약 링크가 더 없으면 남은 문자열을 다 더한다.
+                                elementContent += str;
+                                throw new Error("더이상 분석할 문자열이 없습니다.");
+                            } else {
+                                console.log("분석 중..");
+                                // [[ 앞에 있는 문자열을 먼저 담는다.
+                                // TODO 에러 발생
+                                elementContent += str.substring(0, str.indexOf("[["));
+
+                                // [[ 앞에 있는 문자열을 잘라낸다.
+                                // [[ 뒤에 있는 문자열을 가져옴
+                                str = str.slice(str.indexOf("[["));
+
+                                // 링크에 관련된 문자열을 가지고 온다.
+                                linkStr = str.substring(2, str.indexOf("]]"));
+                                console.log("linkStr: " + linkStr);
+
+                                // 링크가 외부 링크인지(|가 있는지)
+                                // 내부 링크인지 (|가 없는지) 검사한다.
+                                if (linkStr.indexOf("|") != -1) {
+                                    // 외부 링크 (|가 있다)
+                                    console.log("외부 링크 거는 중..");
+                                    if (linkStr.substr(0, 2) == "</") {
+                                        linkStr = linkStr.slice(linkStr.indexOf("<", 2));
+                                    }
+
+                                    var link = linkStr.slice(0, linkStr.indexOf("|")); // 링크 부분
+                                    if (link.substr(0, 2) == "<a") {
+                                        link = link.slice(link.indexOf(">") + 1, link.indexOf("<", 3));
+                                    }
+
+                                    var showStr = linkStr.slice(linkStr.indexOf("|") + 1); // 글자 부분
+                                    
+                                    // <a class='content=link' href='link'>showStr</a>
+                                    elementContent += "<a class='content_link' href='" + link + "' target='_blank'>" + showStr + "</a>";
+                                    console.log("link: " + link);
+
+                                } else {
+                                    console.log("내부 링크 거는 중..");
+                                    // 내부 링크 (|가 없다)
+                                    // 입력한 값과 일치하는 제목이 있을 경우
+                                    // 해당 글로 링크를 건다. (getContent)
+                                    var findContent = function() {
+                                        var contents = JSON.parse(localStorage.getItem("contents"));
+                                        for (var i = 0; i < sectionValue; i++) {
+                                            if (contents[i] != null) {
+                                                if (contents[i]["title"] === linkStr) {
+                                                    // 만약 타이틀이 일치하다면 해당 글로 링크를 건다.
+                                                    // ex) <span class='content_link' onclick='getContent(0)'>ABC</span>
+                                                    elementContent += "<span class='content_link' onclick='getContent(" + i + ")'>" + linkStr + "</span>";
+                                                    return true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (!findContent()) {
+                                        // 만약 해당되는 글이 없을 경우
+                                        elementContent += "<span class='havent_content_link'>" + linkStr + "</span>";
+                                    }
+                                } // if (linkStr.indexOf("|"))
+
+                                // 다시 검사하기 위해 ]] 뒤에 있는 문자열을 가지고 온다.
+                                str = str.slice(str.indexOf("]]") + 2);
+                            } //if (str.indexOf("[[") == -1)
+                            console.log(elementContent);
+                        } catch (e) {
+                            console.log(e);
+                            str = "";
+                        }
+                    } // while(str != "")
+                } //if (str.indexOf("[[") == -1)
+            }
+
+            element.push(elementClass, elementName, elementContent);
+        }
+    }
+}
+
 function updatePage(value) {
     movePage('update');
 
     var content = JSON.parse(localStorage.getItem("contents"))[value];
 
-    var update_head = document.getElementById("update-head");
-    update_head.dataset.content = value;
+    var content_head = document.getElementById("content-head");
+    content_head.dataset.index = value;
 
     var update_content = document.getElementById("update-content");
     var update_title = document.getElementById("update-title");
 
     update_content.innerHTML = content["html"];
+    update_title.value = content["title"];
     update_title.innerText = content["title"];
 
     document.getElementById("cancel").addEventListener("click", function(){
-        if(confirm("변경된 내용은 저장되지 않습니다.\n취소하시겠습니까?")){
         prevPage();
-    } 
-
     });
 
     document.getElementById("content-update").addEventListener("click", function(){
-        if(confirm("저장하시겠습니까?")){
-        updateContent(update_head.dataset.content);
-    } 
-
+        updateContent(content_head.dataset.index);
+        loadCommandButtonFunc2();
     });
 }
-
 
 // 저장
 function updateContent(value) {
@@ -589,7 +1152,7 @@ function updateContent(value) {
     var content = document.getElementById("update-content");
 
     // 각 요소의 값들만 가져온다.
-    var update_title = title.innerText;
+    var update_title = title.value;
     var update_category = category.value;
     var update_content = content.innerText;
     var update_content_html = content.innerHTML;
@@ -611,8 +1174,8 @@ function updateContent(value) {
     // 제목, 카테고리, 내용을 객체로 저장함
     saveData["title"] = update_title;
     saveData["category"] = update_category;
-    saveData["content"] = update_content;
-    saveData["html"] = update_content_html;
+    saveData["content"] = convertContent(update_content);
+    saveData["html"] = contentParsing(update_content_html);
     
     var update_head = document.getElementById("update-head");
     update_head.dataset.content = value;
@@ -622,11 +1185,11 @@ function updateContent(value) {
         var tempContent = JSON.parse(localStorage.getItem("contents"));
         localStorage.removeItem("contents");
         delete tempContent[update_head.dataset.content];
-        tempContent[update_head.dataset.content] = saveData;
+        tempContent[sectionValue] = saveData;
         localStorage.setItem("contents", JSON.stringify(tempContent));
     } else {
         var tempContent = {};
-        tempContent[update_head.dataset.content] = saveData;
+        tempContent[sectionValue] = saveData;
         localStorage.removeItem("contents");
         delete tempContent[update_head.dataset.index]
         localStorage.setItem("contents", JSON.stringify(tempContent));
