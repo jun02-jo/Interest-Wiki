@@ -1,6 +1,5 @@
 var saveData = {};
-// var contents = {};
-var categories = [];
+var categoryList = [];
 var sectionValue = 0;
 var selected = undefined;
 
@@ -24,10 +23,11 @@ function initData() {
 
 /* 카테고리를 가져오는 함수 */
 function getCategories() {
-    categories = JSON.parse(localStorage.getItem("categories"));
-    var categoryList = JSON.parse(JSON.stringify(categories)); // Array
+    var categories = [];
+    categoryList = categories = JSON.parse(localStorage.getItem("categories"));
+    var category_list = JSON.parse(JSON.stringify(categories)); // Array
     // var categoryList = JSON.parse(localStorage.getItem("categories"));
-    var category = categoryList.shift();
+    var category = category_list.shift();
 
     while (category != undefined) {
         // aside에 있는 show-categories 부분에 추가한다.
@@ -46,6 +46,7 @@ function getCategories() {
         category_delete_icon.setAttribute("class", "fa fa-times");
 
         var span = document.createElement("span");
+        span.setAttribute("class", "search-category");
         span.innerText = category;
 
         category_delete.appendChild(category_delete_icon);
@@ -55,13 +56,21 @@ function getCategories() {
 
         // 글 작성 페이지에 있는 카테고리 선택 부분에 추가한다.
         var select_category = document.getElementById("select-category");
+        var update_category = document.getElementById("update-category");
 
-        var option = document.createElement("option");
-        option.value = category;
-        option.innerText = category;
+        var select_option = document.createElement("option");
+        select_option.value = category;
+        select_option.innerText = category;
 
-        select_category.prepend(option);
-    };
+        var update_option = document.createElement("option");
+        update_option.value = category;
+        update_option.innerText = category;
+
+        select_category.prepend(select_option);
+        update_category.prepend(update_option);
+
+        category = category_list.shift();
+    }
 }
 
 
@@ -112,7 +121,7 @@ function setCategories() {
     var show_categories = document.getElementById("show-categories");
 
     // 리스트에 존재하는 카테고리들을 복사한다. (참조없이)
-    var category_list = JSON.parse(JSON.stringify(categories));
+    var category_list = JSON.parse(JSON.stringify(categoryList));
 
     // 복사한 리스트를 하나씩 꺼내며(pop) 카테고리 요소에 추가한다.
     do {
@@ -275,12 +284,12 @@ function addCategoryFunc() {
     input_category.value = "";
 
     // 리스트에 값이 존재하거나 입력 값이 비어있는지 검사한다.
-    if (categories.indexOf(category_name) != -1 || category_name.length == 0) {
+    if (categoryList.indexOf(category_name) != -1 || category_name.length == 0) {
         // 리스트에 값이 있거나 입력 값이 비어있는 경우 경우
         return;
     } else {
         // 리스트에 값이 없을 경우
-        categories.push(category_name);
+        categoryList.push(category_name);
         categorySelectUpdate(category_name);
         return;
     }
@@ -290,14 +299,20 @@ function addCategoryFunc() {
 function categorySelectUpdate(categoryName) {
     // select 요소를 가지고 온다.
     var select_category = document.getElementById("select-category");
+    var update_category = document.getElementById("update-category");
 
     // option을 만든다. (value값은 카테고리 이름으로 정한다.)
-    var option = document.createElement("option");
-    option.value = categoryName;
-    option.innerText = categoryName;
+    var select_option = document.createElement("option");
+    select_option.value = categoryName;
+    select_option.innerText = categoryName;
+
+    var update_option = document.createElement("option");
+    update_option.value = categoryName;
+    update_option.innerText = categoryName;    
 
     // select 요소에 option을 카테고리 없음 위에 추가한다.
-    select_category.prepend(option);
+    select_category.prepend(select_option);
+    update_category.prepend(update_option);
 }
 
 // 카테고리 추가 화면을 끄는 기능
@@ -413,7 +428,7 @@ function saveContent() {
         addCategory(create_category);
 
         // 저장된 카테고리 스토리지에 저장
-        localStorage.setItem("categories", JSON.stringify(categories));
+        localStorage.setItem("categories", JSON.stringify(categoryList));
     }
 
     /* 최근 글 본문 설정 */
@@ -710,6 +725,7 @@ function getContent(value) {
     document.getElementById("content-update-button").addEventListener("click", function(){
         updatePage(content_head.dataset.index);
         loadCommandButtonFunc2();
+        return;
     });
 }
 
@@ -944,6 +960,19 @@ function contentParsing(parsingString="") {
                 findIndex = parseStr.indexOf("<div>", startIndex);
                 parseStr = parseStr.slice(findIndex);
                 index++;
+            } else if (parseStr.indexOf("<br>") != -1) {
+                if (parseStr.indexOf("<br>") == -1) {
+                    strs[index] = parseStr;
+                    throw new Error("더이상 찾을 문자열이 없습니다.");
+                }
+                findIndex = parseStr.indexOf("<br>");
+
+                // 리스트 변수안에 문자열을 추가한다.
+                strs[index] = parseStr.substring(0, findIndex);
+
+                // 찾은 문자열을 제외하고 남은 문자열을 저장한다.
+                parseStr = parseStr.slice(findIndex + 4);
+                index++;
             } else {
                 console.log("시작");
                 // 붙여넣기를 하지 않을 경우 처음은 <div>로 시작하지 않는다.
@@ -1127,9 +1156,40 @@ function updatePage(value) {
     content_head.dataset.index = value;
 
     var update_content = document.getElementById("update-content");
+    update_content.innerHTML = "";
     var update_title = document.getElementById("update-title");
+    update_title.value = "";
 
-    update_content.innerHTML = content["html"];
+    var contents = JSON.parse(content["html"]);
+    for (var i in contents) {
+        if (contents[i][0] == "toc-line") {
+            if (contents[i][2].indexOf("class='havent_content_link'") != -1 || 
+            contents[i][2].indexOf("class='content_link'") != -1) {
+                var contentStr = "";
+
+                if (contents[i][2].indexOf("href") == -1) {
+                    // 내부 링크
+                    contentStr = contents[i][2].slice(contents[i][2].indexOf(">", 8) + 1, contents[i][2].indexOf("</", 10));
+                    update_content.innerText += "[[" + contentStr + "]]" + "\n";
+                } else {
+                    // 외부 링크
+                    var linkPart = contents[i][2].indexOf("href") + 6;
+                    var linkStr = contents[i][2].slice(linkPart, contents[i][2].indexOf("'", linkPart));
+                    contentStr = contents[i][2].slice(contents[i][2].indexOf(">", 8) + 1, contents[i][2].indexOf("</", 10));
+                    update_content.innerText += "[[" + linkStr + "|" + contentStr + "]]" + "\n";
+                }
+            } else if (contents[i][2].indexOf("class='content_list'") != -1) {
+                var contentStr = contents[i][2].slice(contents[i][2].lastIndexOf(">") + 1);
+                update_content.innerText += "*" + contentStr + "\n";
+            } else {
+                update_content.innerText += contents[i][2] + "\n";
+            }
+        } else if (contents[i][0] == "toc-big") {
+            update_content.innerText += "==" + contents[i][2] + "==" + "\n";
+        } else if (contents[i][0] == "toc-small") {
+            update_content.innerText += "===" + contents[i][2] + "===" + "\n";
+        }
+    }
     update_title.value = content["title"];
     update_title.innerText = content["title"];
 
@@ -1156,6 +1216,11 @@ function updateContent(value) {
     var update_category = category.value;
     var update_content = content.innerText;
     var update_content_html = content.innerHTML;
+
+    // 타이틀의 글자 수를 검사한다.
+    if (titleStrLengthCheck()) {
+        return;
+    }
 
     /* 만약 비어있는 경우에 저장을 누르면 이상하게 작동하므로
     경고 문구를 띄워준다. */
@@ -1213,12 +1278,12 @@ function updateContent(value) {
 
 
     /* 카테고리 설정 */
-    if (update_category != "none"){
-        addCategory(update_category);
+    // if (update_category != "none"){
+    //     addCategory(update_category);
 
-        // 저장된 카테고리 스토리지에 저장
-        localStorage.setItem("categories", JSON.stringify(categories));
-    }
+    //     // 저장된 카테고리 스토리지에 저장
+    //     localStorage.setItem("categories", JSON.stringify(categoryList));
+    // }
 
     /* 최근 글 본문 설정 */
     var new_content_content = document.createElement("p");
