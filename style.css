@@ -380,6 +380,12 @@ aside {
 #create-body #create-commands {
     height: 7%;
     margin-bottom: 10px;
+    /* 드래그 방지 */
+    -ms-user-select: none;
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
 }
 
 #create-commands .create-command {
